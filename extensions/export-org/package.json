@@ -1,0 +1,23 @@
+{
+  "name": "pi-export-org",
+  "version": "0.1.0",
+  "description": "pi extension — export a pi session branch to an Org-mode file",
+  "keywords": [
+    "pi-package"
+  ],
+  "license": "LGPL-3.0-or-later",
+  "files": [
+    "export-org.ts",
+    "md2org.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "pi": {
+    "extensions": [
+      "./export-org.ts"
+    ]
+  }
+}
