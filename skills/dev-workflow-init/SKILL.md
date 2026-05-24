@@ -1,5 +1,5 @@
 ---
-name: workflow-init
+name: dev-workflow-init
 description: Scaffold the llm-workflow system into the current project. Creates CLAUDE.md, notes/TODO.md, notes/RETROS.md, and .pi/prompts/ templates. Auto-discovers project context from package.json, composer.json, README, and directory structure to fill in template slots.
 ---
 

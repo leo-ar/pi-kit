@@ -10,10 +10,10 @@ Personal collection of [pi](https://pi.dev) extensions and skills.
 
 ## Skills
 
-| Name                                             | What it does                                               |
-| ------------------------------------------------ | ---------------------------------------------------------- |
-| [investigation-init](skills/investigation-init/) | Scaffold a hypothesis-driven investigation workspace       |
-| [workflow-init](skills/workflow-init/)           | Scaffold an LLM-guided development workflow into a project |
+| Name                                                     | What it does                                               |
+|----------------------------------------------------------|------------------------------------------------------------|
+| [analysis-workflow-init](skills/analysis-workflow-init/) | Scaffold a hypothesis-driven investigation workspace       |
+| [dev-workflow-init](skills/dev-workflow-init/)           | Scaffold an LLM-guided development workflow into a project |
 
 ## Repo layout
 

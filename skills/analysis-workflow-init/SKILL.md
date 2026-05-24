@@ -1,5 +1,5 @@
 ---
-name: investigation-init
+name: analysis-workflow-init
 description: Scaffold a scientific investigation workspace into a directory. Creates AGENTS.md (7-phase methodology), hypotheses.md, verified-facts.md, unsupported-facts.md, open-questions.md, notes.md, TODO.md, and README.md stub. Use when starting a structured data investigation — traffic analysis, anomaly detection, root cause analysis, or any inquiry requiring hypothesis testing and verified conclusions.
 ---
 
