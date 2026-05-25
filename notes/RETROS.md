@@ -1,6 +1,36 @@
 # Retrospectives
 
-## 2026-05-24 — smart-compact refactor (Feature)
+## 2026-05-24 — smart-compact polish (Feature)
+
+**Branch:** `feat/smart-compact-polish`
+**Duration:** Single session (continuation)
+
+### What went well
+
+- All three surfaced items resolved in a single commit. The generator-effects
+  architecture made adding `precomputedFileOps` and `isSplitTurn` trivial —
+  just new fields on `PipelineInput` and a few lines of logic in the generator.
+- Script-runner tests for the new features were quick to write (copy existing
+  pattern, add new assertions). 3 new tests in ~5 minutes.
+- TUI upgrade to `ctx.ui.custom()` with `DynamicBorder` + `Markdown` gives a
+  much richer `compact-stats` display without adding complexity.
+
+### What could improve
+
+- The `compact-stats` TUI doesn't scroll — for very long file lists it may
+  overflow the terminal. Could add scrolling via key handling in future.
+- No integration test against a real pi session — all testing is unit-level.
+  Would be valuable to run with `pi -e ./smart-compact.ts` and trigger
+  compaction on a real long session.
+
+### Lessons
+
+- Generator-effects payoff: adding new pipeline features requires zero changes
+  to the runner. Just extend the generator, add tests, done.
+- `PrecomputedFileOps` maintains the disjointness invariant explicitly (loop
+  removes modified from read) — same pattern as the original extraction, so
+  existing property tests still cover the logic.
+
 
 **Branch:** `smart-compact`
 **Duration:** Single session
