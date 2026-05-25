@@ -180,4 +180,90 @@ describe("compactPipeline — script runner", () => {
     assert(prompt.includes("<previous-summary>"));
     assert(prompt.includes("We were working on auth"));
   });
+
+  it("uses precomputedFileOps when provided, overriding extraction", () => {
+    const input: PipelineInput = {
+      ...basicInput,
+      precomputedFileOps: {
+        read: new Set(["config.json"]),
+        written: new Set(["dist/output.js"]),
+        edited: new Set(["src/main.ts"]),
+      },
+    };
+
+    // LLM summary mentions the precomputed files
+    const llmSummary = "## Goal\nBuild output\n\nModified dist/output.js and src/main.ts";
+
+    const result = runScript(compactPipeline(input), [
+      [{ tag: "get_model" }, fakeModel],
+      [{ tag: "get_auth" }, { ok: true, apiKey: "sk-test", headers: {} }],
+      [{ tag: "serialize" }, "conversation"],
+      [{ tag: "notify", level: "info" }, undefined],
+      [{ tag: "llm_complete" }, llmSummary],
+    ]);
+
+    assert(result !== undefined);
+    // Should use precomputed files, not re-extracted ones
+    assert(result.summary.includes("<modified-files>"));
+    assert(result.summary.includes("dist/output.js"));
+    assert(result.summary.includes("src/main.ts"));
+    assert(result.summary.includes("<read-files>"));
+    assert(result.summary.includes("config.json"));
+    // Original extracted file (src/auth.ts) should NOT be in modified
+    assert(!result.summary.includes("src/auth.ts"));
+  });
+
+  it("adds in-progress turn section when isSplitTurn with turnPrefixMessages", () => {
+    const turnMessages: Message[] = [
+      { role: "user", content: [{ type: "text", text: "Now let's add error handling to the parser" }] },
+      {
+        role: "assistant",
+        content: [
+          { type: "toolCall", name: "edit", arguments: { path: "src/parser.ts" } },
+        ],
+      },
+      { role: "toolResult", isError: true, content: [{ type: "text", text: "SyntaxError: unexpected token" }] },
+    ];
+
+    const input: PipelineInput = {
+      ...basicInput,
+      isSplitTurn: true,
+      turnPrefixMessages: turnMessages,
+    };
+
+    const llmSummary = "## Goal\nRefactor auth\n\n## Progress\n- [x] Updated src/auth.ts";
+
+    const result = runScript(compactPipeline(input), [
+      [{ tag: "get_model" }, fakeModel],
+      [{ tag: "get_auth" }, { ok: true, apiKey: "sk-test", headers: {} }],
+      [{ tag: "serialize" }, "conversation"],
+      [{ tag: "notify", level: "info" }, undefined],
+      [{ tag: "llm_complete" }, llmSummary],
+    ]);
+
+    assert(result !== undefined);
+    assert(result.summary.includes("## In-Progress Turn"));
+    assert(result.summary.includes("src/parser.ts"));
+    assert(result.summary.includes("SyntaxError"));
+  });
+
+  it("does not add in-progress turn section when isSplitTurn is false", () => {
+    const input: PipelineInput = {
+      ...basicInput,
+      isSplitTurn: false,
+    };
+
+    const llmSummary = "## Goal\nRefactor auth\n\n## Progress\n- [x] Updated src/auth.ts";
+
+    const result = runScript(compactPipeline(input), [
+      [{ tag: "get_model" }, fakeModel],
+      [{ tag: "get_auth" }, { ok: true, apiKey: "sk-test", headers: {} }],
+      [{ tag: "serialize" }, "conversation"],
+      [{ tag: "notify", level: "info" }, undefined],
+      [{ tag: "llm_complete" }, llmSummary],
+    ]);
+
+    assert(result !== undefined);
+    assert(!result.summary.includes("## In-Progress Turn"));
+  });
 });

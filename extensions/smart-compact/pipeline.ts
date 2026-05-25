@@ -36,6 +36,13 @@ export interface CompactionOutput {
 
 // ─── Pipeline Input ──────────────────────────────────────────────────────────
 
+/** Pre-computed file operations from pi's preparation (optional). */
+export interface PrecomputedFileOps {
+  read: Set<string>;
+  written: Set<string>;
+  edited: Set<string>;
+}
+
 export interface PipelineInput {
   messages: Message[];
   tokensBefore: number;
@@ -43,6 +50,12 @@ export interface PipelineInput {
   previousSummary?: string;
   /** Max chars for serialized conversation (prevents context overflow) */
   maxConversationChars?: number;
+  /** Pre-computed file ops from pi's preparation — avoids re-extraction */
+  precomputedFileOps?: PrecomputedFileOps;
+  /** Whether the compaction cuts mid-turn (turnPrefixMessages present) */
+  isSplitTurn?: boolean;
+  /** Messages from the in-progress turn (when splitting) */
+  turnPrefixMessages?: Message[];
 }
 
 // ─── The Pipeline Generator ──────────────────────────────────────────────────
@@ -50,12 +63,34 @@ export interface PipelineInput {
 export function* compactPipeline(
   input: PipelineInput,
 ): Generator<CompactEffect, CompactionOutput | undefined, any> {
-  const { messages, tokensBefore, firstKeptEntryId, previousSummary, maxConversationChars } = input;
+  const {
+    messages,
+    tokensBefore,
+    firstKeptEntryId,
+    previousSummary,
+    maxConversationChars,
+    precomputedFileOps,
+    isSplitTurn,
+    turnPrefixMessages,
+  } = input;
 
   if (messages.length === 0) return undefined;
 
   // Phase 1: Deterministic extraction (pure, no effect needed)
   const extraction = extractFacts(messages);
+
+  // Override file ops with precomputed data from pi if available
+  if (precomputedFileOps) {
+    extraction.files.read = new Set(precomputedFileOps.read);
+    extraction.files.modified = new Set([
+      ...precomputedFileOps.written,
+      ...precomputedFileOps.edited,
+    ]);
+    // Maintain disjointness: remove modified from read
+    for (const f of extraction.files.modified) {
+      extraction.files.read.delete(f);
+    }
+  }
 
   // Get model
   const model: unknown = yield { tag: "get_model" };
@@ -109,6 +144,24 @@ export function* compactPipeline(
   const gaps = verify(summary, extraction);
   if (gaps.length > 0) {
     summary = patchSummary(summary, gaps);
+  }
+
+  // If splitting mid-turn, add context about the in-progress turn
+  if (isSplitTurn && turnPrefixMessages && turnPrefixMessages.length > 0) {
+    const turnExtraction = extractFacts(turnPrefixMessages);
+    const turnContext: string[] = [];
+    if (turnExtraction.goal) {
+      turnContext.push(`Current turn goal: ${turnExtraction.goal}`);
+    }
+    if (turnExtraction.files.modified.size > 0) {
+      turnContext.push(`Turn modified: ${[...turnExtraction.files.modified].join(", ")}`);
+    }
+    if (turnExtraction.errors.length > 0) {
+      turnContext.push(`Turn errors: ${turnExtraction.errors[turnExtraction.errors.length - 1]}`);
+    }
+    if (turnContext.length > 0) {
+      summary += `\n\n## In-Progress Turn\n${turnContext.map((l) => `- ${l}`).join("\n")}`;
+    }
   }
 
   // Append file tracking tags (pi's standard format)

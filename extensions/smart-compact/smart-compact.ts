@@ -15,7 +15,8 @@
 
 import { complete } from "@earendil-works/pi-ai";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { convertToLlm, serializeConversation } from "@earendil-works/pi-coding-agent";
+import { convertToLlm, DynamicBorder, getMarkdownTheme, serializeConversation } from "@earendil-works/pi-coding-agent";
+import { Container, Markdown, matchesKey, Text } from "@earendil-works/pi-tui";
 
 import { extractFacts } from "./extraction.ts";
 import { compactPipeline } from "./pipeline.ts";
@@ -26,7 +27,7 @@ import type { CompactEffect } from "./pipeline.ts";
 export default function smartCompact(pi: ExtensionAPI) {
   pi.on("session_before_compact", async (event, ctx) => {
     const { preparation, signal } = event;
-    const { messagesToSummarize, turnPrefixMessages, tokensBefore, firstKeptEntryId, previousSummary } = preparation;
+    const { messagesToSummarize, turnPrefixMessages, tokensBefore, firstKeptEntryId, previousSummary, isSplitTurn, fileOps } = preparation;
 
     // Combine all messages to summarize
     const allMessages = [...messagesToSummarize, ...turnPrefixMessages];
@@ -34,6 +35,7 @@ export default function smartCompact(pi: ExtensionAPI) {
 
     // Convert to LLM format for the pipeline
     const llmMessages = convertToLlm(allMessages);
+    const llmTurnPrefixMessages = isSplitTurn ? convertToLlm(turnPrefixMessages) : undefined;
 
     // Estimate conversation budget: leave room for prompt overhead + output
     const model = ctx.model;
@@ -47,6 +49,9 @@ export default function smartCompact(pi: ExtensionAPI) {
       firstKeptEntryId,
       previousSummary,
       maxConversationChars,
+      precomputedFileOps: fileOps,
+      isSplitTurn,
+      turnPrefixMessages: llmTurnPrefixMessages,
     });
 
     let step = gen.next();
@@ -144,25 +149,69 @@ export default function smartCompact(pi: ExtensionAPI) {
 
       const messages = convertToLlm(agentMessages);
       const extraction = extractFacts(messages);
-      const lines = [
-        `**Goal:** ${extraction.goal || "(none detected)"}`,
-        `**Files modified:** ${extraction.files.modified.size}`,
-        `**Files read:** ${extraction.files.read.size}`,
-        `**Errors:** ${extraction.errors.length}`,
-        `**Decisions:** ${extraction.decisions.length}`,
-        `**Constraints:** ${extraction.constraints.length}`,
+
+      const modifiedList = [...extraction.files.modified].slice(-15);
+      const readList = [...extraction.files.read].slice(-10);
+
+      const md = [
+        `## Extraction Stats`,
         "",
-        extraction.files.modified.size > 0
-          ? `Modified: ${[...extraction.files.modified].slice(-10).join(", ")}`
+        `**Goal:** ${extraction.goal || "(none detected)"}`,
+        "",
+        `### Files`,
+        `| Type | Count |`,
+        `|------|-------|`,
+        `| Modified | ${extraction.files.modified.size} |`,
+        `| Read-only | ${extraction.files.read.size} |`,
+        "",
+        modifiedList.length > 0
+          ? `**Modified:**\n${modifiedList.map((f) => `- \`${f}\``).join("\n")}`
           : "",
+        readList.length > 0
+          ? `\n**Read-only:**\n${readList.map((f) => `- \`${f}\``).join("\n")}`
+          : "",
+        "",
+        `### Signals`,
+        `| Type | Count |`,
+        `|------|-------|`,
+        `| Errors | ${extraction.errors.length} |`,
+        `| Decisions | ${extraction.decisions.length} |`,
+        `| Constraints | ${extraction.constraints.length} |`,
+        "",
         extraction.errors.length > 0
-          ? `Last error: ${extraction.errors[extraction.errors.length - 1]}`
+          ? `**Recent errors:**\n${extraction.errors.slice(-3).map((e) => `- ${e}`).join("\n")}`
+          : "",
+        extraction.decisions.length > 0
+          ? `\n**Decisions:**\n${extraction.decisions.slice(-5).map((d) => `- ${d}`).join("\n")}`
+          : "",
+        extraction.constraints.length > 0
+          ? `\n**Constraints:**\n${extraction.constraints.map((c) => `- ${c}`).join("\n")}`
           : "",
       ]
         .filter(Boolean)
         .join("\n");
 
-      ctx.ui.notify(lines, "info");
+      await ctx.ui.custom((_tui, theme, _kb, done) => {
+        const container = new Container();
+        const border = new DynamicBorder((s: string) => theme.fg("accent", s));
+        const mdTheme = getMarkdownTheme();
+
+        container.addChild(border);
+        container.addChild(new Text(theme.fg("accent", theme.bold("smart-compact extraction")), 1, 0));
+        container.addChild(new Markdown(md, 1, 1, mdTheme));
+        container.addChild(new Text(theme.fg("dim", "Press Enter or Esc to close"), 1, 0));
+        container.addChild(border);
+
+        return {
+          render: (width: number) => container.render(width),
+          invalidate: () => container.invalidate(),
+          handleInput: (data: string) => {
+            if (matchesKey(data, "enter") || matchesKey(data, "escape")) {
+              done(undefined);
+            }
+          },
+        };
+      });
     },
   });
 }
