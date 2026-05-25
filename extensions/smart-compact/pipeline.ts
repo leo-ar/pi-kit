@@ -1,9 +1,14 @@
 /**
  * Generator-based compaction pipeline.
  *
- * Yields effects for I/O operations (model lookup, auth, LLM call, notify).
- * The extension entry point acts as the runner that interprets these effects.
- * Tests step through the generator with scripted responses.
+ * Pure generator that yields effects for I/O (model lookup, auth, LLM call).
+ * The thin runner in smart-compact.ts interprets these with real pi APIs.
+ * Tests step through the generator with scripted responses (no mocking needed).
+ *
+ * Key design choice: verification only checks critical errors (timeouts, rate
+ * limits, crashes) — transient/recoverable errors (edit retries, ENOENT, etc.)
+ * are intentionally filtered out. This matches pi's default behavior of dropping
+ * noise while catching the errors pi's default misses.
  */
 
 import type { Extraction, Message } from "./extraction.ts";

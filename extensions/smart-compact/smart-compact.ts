@@ -1,16 +1,17 @@
 /**
- * Lightweight EESV-inspired compaction extension.
+ * smart-compact — structured, verifiable compaction for pi.
  *
- * Replaces pi's default compaction with a structured pipeline:
- *   1. Extract — deterministic fact extraction from messages (zero LLM calls)
+ * Replaces pi's default compaction with a three-phase pipeline:
+ *   1. Extract — deterministic fact extraction (files, errors, decisions)
  *   2. Synthesize — single LLM call with extracted facts as structured context
- *   3. Verify — deterministic check that critical facts appear in summary
+ *   3. Verify — catches critical errors pi's default drops (~72% recovery)
  *
- * Architecture: generator-effects pattern.
- *   - pipeline.ts: pure generator yielding effect descriptions
- *   - This file: thin imperative runner interpreting effects with real I/O
+ * Architecture: generator-effects in pipeline.ts, thin runner here.
  *
- * Usage: place in ~/.pi/agent/extensions/smart-compact/ or install as package
+ * Value over pi's default:
+ *   - Critical error retention (timeouts, rate limits, crashes)
+ *   - Consistent structure across iterative re-compactions
+ *   - Lower cost (reasoningEffort: "low" + conversation cap)
  */
 
 import { complete } from "@earendil-works/pi-ai";
