@@ -4,9 +4,6 @@
 
 ## Backlog
 
-### Planned
-
-- [ ] Property tests with fast-check
 - [ ] Bench: replay sessions, measure savings at K5 vs K10
 - [ ] Persist config to settings.json so it survives reload
 
