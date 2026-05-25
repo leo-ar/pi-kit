@@ -1,5 +1,32 @@
 # Retrospectives
 
+## 2026-05-25 — Cleanup & merge to main (Feature)
+
+**Branch:** `feat/context-pruner` → squash-merged to `main`
+
+### What went well
+
+- Clean squash merge: 18 commits → 1. Commit message captures the full
+  feature scope without noise.
+- Debug removal was trivial — `lastDebug` replaced with `lastStats` (3
+  fields vs a full roles reduce). Code went from 132 → 118 lines.
+- 63 tests green before merge. No regressions.
+- Notes reorganized per-extension — no more shared top-level `notes/`.
+
+### What went wrong
+
+- Nothing major. The `git branch -d` failed (expected with squash merge)
+  but `-D` resolved it immediately.
+
+### Lessons
+
+- **Squash merge for feature branches.** Individual commits during
+  exploration have no archival value. One clean commit tells the story.
+- **Keep TODO current after merge.** Stale "done" items mislead the next
+  session.
+
+---
+
 ## 2026-05-25 — UI polish pass (Feature)
 
 **Branch:** `feat/context-pruner`
