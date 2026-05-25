@@ -1,0 +1,25 @@
+{
+  "name": "pi-context-pruner",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Reduces context tokens by stubbing stale tool results — saves ~11-17% per turn",
+  "keywords": [
+    "pi-package"
+  ],
+  "license": "LGPL-3.0-or-later",
+  "files": [
+    "context-pruner.ts",
+    "pruning.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-ai": "*"
+  },
+  "pi": {
+    "extensions": [
+      "./context-pruner.ts"
+    ]
+  }
+}

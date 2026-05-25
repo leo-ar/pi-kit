@@ -32,6 +32,8 @@
   existing property tests still cover the logic.
 
 
+## 2026-05-24 — smart-compact refactor (Feature)
+
 **Branch:** `smart-compact`
 **Duration:** Single session
 
