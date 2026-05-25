@@ -2,7 +2,7 @@
   "name": "pi-smart-compact",
   "version": "0.1.0",
   "type": "module",
-  "description": "Structured compaction for pi — catches critical errors the default drops, enforces consistent format, lower cost",
+  "description": "Safety-net compaction for pi — catches critical errors the default drops in long sessions",
   "keywords": [
     "pi-package"
   ],

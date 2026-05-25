@@ -5,19 +5,20 @@ verifiable alternative.
 
 ## Why?
 
-Pi's default compaction is already excellent at file tracking (100% coverage in
-our benchmarks). Where it falls short is **critical error retention** — it drops
-~72% of timeouts, rate limits, and unrecoverable failures. In long sessions with
-multiple compactions, this means the agent loses awareness of infrastructure
-issues that may still be relevant.
+Pi's default compaction is already excellent — 100% file tracking coverage and
+detailed freeform summaries. smart-compact is a **safety net**, not a
+replacement you'd notice day-to-day.
 
-smart-compact addresses three gaps:
+The one measurable gap: pi's default drops ~72% of critical errors (timeouts,
+rate limits, crashes). In very long sessions with multiple compactions, the
+agent loses awareness of infrastructure issues that may recur. smart-compact
+catches these and patches them back in.
 
-| Gap | What smart-compact does |
-|-----|------------------------|
-| Critical errors dropped | Deterministic verification catches missing errors and patches them back in |
-| Inconsistent format | Enforces fixed headings (Goal, Progress, Decisions, etc.) so iterative re-compaction stays stable |
-| Cost | Uses `reasoningEffort: "low"` + conversation cap — cheaper per compaction call |
+| What it does | Why |
+|-------------|-----|
+| Verifies critical errors are mentioned | Safety net for long sessions |
+| Consistent heading structure | Stable scaffolding for iterative re-compaction |
+| `reasoningEffort: "low"` | Slightly cheaper per compaction call |
 
 ## How it works
 
