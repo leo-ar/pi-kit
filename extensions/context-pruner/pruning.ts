@@ -23,7 +23,7 @@ export interface PrunerConfig {
 }
 
 export const DEFAULT_CONFIG: PrunerConfig = {
-  recentTurnsToKeep: 5,
+  recentTurnsToKeep: 10,
   minSizeToStub: 500,
   pruneReads: true,
   pruneBashInformational: true,
