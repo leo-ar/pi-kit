@@ -1,0 +1,24 @@
+{
+  "name": "pi-smart-compact",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "pi extension — lightweight EESV-inspired compaction with deterministic extraction, single-call synthesis, and verification",
+  "keywords": [
+    "pi-package"
+  ],
+  "license": "LGPL-3.0-or-later",
+  "files": [
+    "smart-compact.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-ai": "*"
+  },
+  "pi": {
+    "extensions": [
+      "./smart-compact.ts"
+    ]
+  }
+}
