@@ -2,7 +2,7 @@
   "name": "pi-context-pruner",
   "version": "0.1.0",
   "type": "module",
-  "description": "Reduces context tokens by stubbing stale tool results — saves ~11-17% per turn",
+  "description": "Reduces context tokens by stubbing stale tool results (~50% chars saved per LLM call)",
   "keywords": [
     "pi-package"
   ],

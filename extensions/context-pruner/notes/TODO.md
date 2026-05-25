@@ -6,11 +6,9 @@
 
 _(empty — feature complete)_
 
-### Surfaced
+### Design Decisions (closed)
 
-- `/prune-stats` still writes to conversation (4 lines) — acceptable tradeoff
-  since it's the only command that benefits from multi-line output
-- `ctx.ui.custom()` not supported in emacs — rules out modals for this frontend
-- `ctx.ui.setWidget()` silently ignored in emacs
-- Config is ephemeral by design — live tuning via `/prune-keep` for experimentation,
-  resets to K9 on reload. No persistence needed.
+- `/prune-stats` outputs to conversation (sendMessage) — only command needing
+  multi-line; acceptable context cost for a manually-triggered diagnostic.
+- No `ctx.ui.custom()` or `ctx.ui.setWidget()` — unsupported in emacs frontend.
+- Config is ephemeral — resets to K9 on reload, tunable via `/prune-keep`.

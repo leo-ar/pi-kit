@@ -5,8 +5,8 @@ with lightweight stubs before each LLM call.
 
 ## Problem
 
-Between compactions (~100 turns), tool results accumulate in context. The LLM
-re-reads all of them every turn, even though most are stale:
+Between compactions, tool results accumulate in context. The LLM re-reads all of
+them every turn, even though most are stale:
 
 - A file read 40 turns ago (already processed, possibly since modified)
 - A directory listing from before a restructure
@@ -14,78 +14,72 @@ re-reads all of them every turn, even though most are stale:
 - Test output from a run that's since been re-run
 
 In real sessions, **76% of context is tool results** and **77% of those are in
-the "old" first 70% of messages**. Most of this bulk is never referenced again.
+the "old" first 70% of messages**.
 
-## Approach: Supersession-aware pruning (Strategy 2)
+## How it works
 
-Replace old tool results with one-line stubs. Decide what to prune based on
-whether the result is **stale**, **ephemeral**, or **still relevant**:
+Hooks pi's `context` event (fires before every LLM call). Replaces old tool
+results with one-line stubs. The session is never modified — only the in-flight
+context copy is altered.
 
-### What gets pruned (old messages only — recent N turns always kept)
+### What gets pruned (old messages only — recent K turns always kept)
 
-| Category | Condition | Stub format |
-|----------|-----------|-------------|
-| Read (superseded) | File was later written/edited | `[read src/foo.ts — 245 lines (file was later modified)]` |
-| Read (old) | Not superseded but old | `[read src/foo.ts — 245 lines]` |
-| bash: ls/find/tree | Always ephemeral | `[ls src/ — 47 entries]` |
-| bash: cat/head/tail | Same as read | `[cat file — 120 lines]` |
-| bash: grep/rg | Search results are re-runnable | `[grep "pattern" — 23 matches]` |
-| bash: other >2KB | Large one-shot output | `[bash: <command> — 4.2KB output, exit 0]` |
+| Category | Stub format |
+|----------|-------------|
+| Read (superseded by later write/edit) | `[read src/foo.ts — 245 lines (file was later modified)]` |
+| Read (old) | `[read src/foo.ts — 245 lines]` |
+| bash: ls/find/tree | `[ls src/ — 47 entries]` |
+| bash: cat/head/tail | `[cat file — 120 lines]` |
+| bash: grep/rg | `[grep "pattern" — 23 matches]` |
+| bash: other >2KB | `[bash: <command> — 4.2KB output, exit 0]` |
 
 ### What's always kept
 
-| Category | Why |
-|----------|-----|
-| Recent (last N turns) | Agent may reference immediately |
-| Small results (<500 chars) | Cheap to keep, might be referenced |
-| Error results | Agent needs error context |
-| Edit/write confirmations | Small, structurally important |
-| bash: other <2KB | Small enough to keep |
+- Recent turns (last K user turns — default K9)
+- Small results (<500 chars)
+- Error results
+- Edit/write confirmations
+
+## Measured savings
+
+Benchmarked across 23 real sessions (468 measurement slices, 20K+ messages):
+
+| Config | Avg chars saved per LLM call | Avg % of context |
+|--------|------------------------------|------------------|
+| K10 | 324 KB | 47.8% |
+| K9 (default) | ~340 KB | ~50% |
+| K5 | 356 KB | 57.9% |
+| K3 | 369 KB | 62.1% |
+
+K5 and K10 converge in long sessions (both ~60%). The difference matters only
+in the 5-15 turn window where context pressure is lowest.
+
+## Commands
+
+| Command | Effect |
+|---------|--------|
+| `/prune-stats` | Show savings for this session (to conversation) |
+| `/prune-keep` | Show current K level (ephemeral) |
+| `/prune-keep 5` | Set to K5 for this session (ephemeral) |
+| `/prune-config` | Show all config values (ephemeral) |
+
+## Status bar
+
+Auto-updates on every LLM call: `🪓 47.6KB K9`
 
 ## Architecture
 
-Same generator-effects pattern as smart-compact:
-
 ```
-pruning.ts        — pure logic: classify messages, decide what to prune, generate stubs
-context-pruner.ts — thin runner: context event handler, interprets decisions
+pruning.ts        — pure logic, zero pi imports, fully tested
+context-pruner.ts — thin runner: context event + commands
 ```
 
-The `context` event provides a **deep copy** of messages — we mutate freely
-without affecting the session. The session file is never modified.
-
-## Projected savings
-
-Based on analysis of 111 real between-compaction slices (12.9MB of tool results):
-
-| Strategy | Savings per turn | Combined with RTK |
-|----------|-----------------|-------------------|
-| Conservative (superseded reads + informational bash) | ~11% | ~20% |
-| Aggressive (all old except small + errors) | ~17% | ~25% |
-
-## Configuration
-
-```json
-{
-  "recentTurnsToKeep": 10,
-  "minSizeToStub": 500,
-  "pruneReads": true,
-  "pruneBashInformational": true,
-  "pruneBashLarge": true,
-  "pruneBashLargeThreshold": 2048
-}
-```
-
-## Risk mitigation
-
-- Stubs include enough info to re-run (`[grep "pattern" — 23 matches]`)
-- Error results are never pruned
-- Recent turns (configurable window) are always kept intact
-- Small results are always kept (negligible savings, might be referenced)
-- Session files are never modified — pruning is context-only
+28 tests (21 unit + 7 property tests with fast-check).
 
 ## Install
 
+Symlink or copy to `~/.pi/agent/extensions/context-pruner/`.
+
 ```bash
-pi install git:github.com/leo-ar/pi-kit extensions/context-pruner
+ln -s /path/to/pi-kit/extensions/context-pruner ~/.pi/agent/extensions/context-pruner
 ```
