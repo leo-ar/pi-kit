@@ -18,3 +18,7 @@
 ### Planned
 
 ### Surfaced
+
+- [ ] Use `preparation.fileOps` from pi instead of re-extracting (needs testing against real pi types)
+- [ ] Handle `preparation.isSplitTurn` / `turnPrefixMessages` more explicitly
+- [ ] Upgrade `compact-stats` command to `ctx.ui.custom()` for richer display
