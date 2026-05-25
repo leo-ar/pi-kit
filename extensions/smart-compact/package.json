@@ -9,6 +9,10 @@
   "license": "LGPL-3.0-or-later",
   "files": [
     "smart-compact.ts",
+    "extraction.ts",
+    "verification.ts",
+    "prompts.ts",
+    "pipeline.ts",
     "README.md",
     "LICENSE"
   ],
