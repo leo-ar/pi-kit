@@ -9,7 +9,7 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import fc from "fast-check";
-import { verify, patchSummary } from "./verification.ts";
+import { verify, patchSummary, isTransientError, criticalErrors } from "./verification.ts";
 import type { Extraction, FileOps } from "./extraction.ts";
 
 // ─── Arbitraries ─────────────────────────────────────────────────────────────
@@ -47,9 +47,10 @@ describe("verify — properties", () => {
   it("for all summaries containing every modified filename, verify returns empty gaps", () => {
     fc.assert(
       fc.property(arbExtraction, fc.string({ maxLength: 200 }), (extraction, baseSummary) => {
-        // Build a summary guaranteed to contain all modified filenames and error snippets
+        // Build a summary guaranteed to contain all modified filenames and critical error snippets
         const filenames = [...extraction.files.modified].map((f) => f.split("/").pop()!);
-        const errorSnippets = extraction.errors.slice(-3).map((e) => e.slice(0, 30));
+        const critical = criticalErrors(extraction.errors);
+        const errorSnippets = critical.slice(-3).map((e) => e.slice(0, 30));
         const summary = baseSummary + " " + filenames.join(" ") + " " + errorSnippets.join(" ");
 
         const gaps = verify(summary, extraction);
@@ -152,5 +153,70 @@ describe("patchSummary — examples", () => {
     const result = patchSummary("## Summary", ["Missing modified file: src/app.ts"]);
     // File gaps are intentionally NOT patched — the caller appends file tags unconditionally
     assert(!result.includes("<modified-files>"));
+  });
+});
+
+// ─── Error Classification Tests ──────────────────────────────────────────────
+
+describe("isTransientError", () => {
+  it("classifies edit-not-found as transient", () => {
+    assert(isTransientError("Could not find the exact text in src/app.ts. The old text must match exactly."));
+  });
+
+  it("classifies ENOENT as transient", () => {
+    assert(isTransientError("ENOENT: no such file or directory, access '/tmp/foo'"));
+  });
+
+  it("classifies validation errors as transient", () => {
+    assert(isTransientError("Validation failed for tool \"edit\": missing required field"));
+  });
+
+  it("classifies no-op edits as transient", () => {
+    assert(isTransientError("No changes made to README.md. The replacement produced identical output."));
+  });
+
+  it("classifies (no output) as transient", () => {
+    assert(isTransientError("(no output)"));
+  });
+
+  it("does NOT classify TypeError as transient", () => {
+    assert(!isTransientError("TypeError: cannot read property 'foo' of undefined"));
+  });
+
+  it("does NOT classify timeout as transient", () => {
+    assert(!isTransientError("Command timed out after 30 seconds"));
+  });
+
+  it("does NOT classify rate limit as transient", () => {
+    assert(!isTransientError('{"message":"API rate limit exceeded"}'));
+  });
+
+  it("classifies bash syntax errors as transient (agent retries)", () => {
+    assert(isTransientError("/bin/bash: -c: line 7: syntax error near unexpected token"));
+  });
+});
+
+describe("criticalErrors", () => {
+  it("filters out transient errors, keeps critical ones", () => {
+    const errors = [
+      "Could not find the exact text in src/app.ts",
+      "TypeError: x is not a function",
+      "ENOENT: no such file or directory, access '/tmp/x'",
+      "Command timed out after 30 seconds",
+    ];
+    const critical = criticalErrors(errors);
+    assert.deepStrictEqual(critical, [
+      "TypeError: x is not a function",
+      "Command timed out after 30 seconds",
+    ]);
+  });
+
+  it("returns empty array when all errors are transient", () => {
+    const errors = [
+      "Could not find the exact text in foo.ts",
+      "No changes made to bar.md. The replacement produced identical output.",
+      "(no output)",
+    ];
+    assert.deepStrictEqual(criticalErrors(errors), []);
   });
 });
