@@ -1,62 +1,52 @@
-# pi-export-org
+# export-org
 
-A [pi](https://pi.dev) extension that exports the current session branch to an
+A pi extension that exports the current session to an
 [Org-mode](https://orgmode.org) file.
 
-## Usage
+## Why?
+
+Org-mode is a natural archival format for LLM sessions — headings map to turns,
+source blocks map to tool calls, and properties drawers capture metadata. This
+extension makes sessions reviewable and searchable in Emacs.
+
+## How it works
+
+Registers `/export-org` which walks the current session branch, converts
+Markdown to Org syntax, and writes a `.org` file.
 
 ```
 /export-org             → <cwd>/<session-id>.org
 /export-org notes.org   → <cwd>/notes.org
 ```
 
-Each conversation turn becomes an Org heading. Assistant tool calls (bash, read,
-write, edit) are rendered as appropriate `#+begin_src` or `#+begin_example`
-blocks. Token usage and session metadata are stored in `PROPERTIES` drawers.
+Each turn becomes an Org heading. Tool calls render as `#+begin_src` blocks.
+Token usage and metadata go in `:PROPERTIES:` drawers.
+
+## What gets exported
+
+| Content | Org rendering |
+|---------|---------------|
+| User turns | `* You [timestamp]` heading |
+| Assistant turns | `* Assistant [timestamp]` with model/provider properties |
+| Bash calls | `#+begin_src bash` + `#+begin_example` output |
+| File reads/writes | `#+begin_src <lang>` (language inferred from extension) |
+| Diffs | `#+begin_src diff` |
+| Token totals | File-level `:PROPERTIES:` drawer |
+
+## Commands
+
+| Command | Effect |
+|---------|--------|
+| `/export-org` | Export to `<session-id>.org` in cwd |
+| `/export-org path.org` | Export to specified path |
 
 ## Install
 
 ```bash
-pi install npm:pi-export-org
+pi install git:github.com/leo-ar/pi-kit extensions/export-org
 ```
 
-Or via git:
-
+Or symlink for development:
 ```bash
-pi install git:github.com/leo-ar/pi-export-org
+ln -s /path/to/pi-kit/extensions/export-org ~/.pi/agent/extensions/export-org
 ```
-
-## What gets exported
-
-- **User turns** — rendered as `* You [timestamp]` headings, with Markdown
-  converted to Org syntax
-
-- **Assistant turns** — rendered as `* Assistant [timestamp]` headings with
-  model/provider in a `:PROPERTIES:` drawer
-
-- **Bash calls** — command in `#+begin_src bash`, output in `#+begin_example`
-
-- **File reads/writes** — syntax-highlighted `#+begin_src <lang>` blocks
-
-- **Diffs** — `#+begin_src diff` blocks
-
-- **Token totals** — accumulated across the session in the file-level
-  `:PROPERTIES:` drawer
-
-## Files
-
-| File             | Purpose                                                   |
-| ---------------- | --------------------------------------------------------- |
-| `export-org.ts`  | Extension entry point — registers `/export-org`           |
-| `md2org.ts`      | Markdown → Org-mode converter (mirrors `gptel-md2org.el`) |
-| `md2org-test.ts` | Test suite (mirrors `gptel-md2org-test.el`)               |
-
-**Run tests:**
-
-```bash
-node --experimental-strip-types md2org-test.ts
-```
-
-## License
-
-LGPL v3 — see [LICENSE](LICENSE)

@@ -1,32 +1,26 @@
-# export-org — agent context
-
-This extension registers a `/export-org` command that writes the current pi session branch to an Org-mode file.
+# AGENTS.md — export-org extension
 
 ## Files
 
-- `export-org.ts` — entry point, registers the `/export-org` command
-- `md2org.ts` — Markdown → Org-mode converter, mirrors `gptel-md2org.el` pass-for-pass
-- `md2org-test.ts` — test suite mirroring `gptel-md2org-test.el`; run with `node
---experimental-strip-types md2org-test.ts`
+```
+export-org.ts    Entry point — registers /export-org command
+md2org.ts        Markdown → Org-mode converter (mirrors gptel-md2org.el)
+md2org-test.ts   Test suite (mirrors gptel-md2org-test.el)
+```
 
-## What the command does
+## Key types
 
-1. Reads the current session branch via `ctx.sessionManager.getBranch()`
-2. Walks entries in order: user messages, assistant messages, tool calls and
-   their results
-3. Converts all Markdown to Org syntax via `md2org.ts`
-4. Writes a `.org` file to the session's working directory
+- Session entries from `ctx.sessionManager.getBranch()` — user, assistant,
+  tool_call, tool_result entries
+- `TokenAccumulator` — tracks input/output/cache tokens across turns
+- md2org operates on raw strings, no special types
 
-## Org output structure
+## Export flow
 
-- File-level `:PROPERTIES:` drawer — session file path, cwd, token totals
-- `* You [timestamp]` — user turn headings
-- `* Assistant [timestamp]` — assistant turn headings with `:PROPERTIES:` drawer
-  (model, provider, thinking level)
-- `#+begin_src bash` / `#+begin_example` — bash commands and their output
-- `#+begin_src <lang>` — file reads/writes, language inferred from file extension
-- `#+begin_src diff` — edit diffs
-- Model/provider drawer only emitted on first assistant turn and when either changes
+1. `ctx.sessionManager.getBranch()` → array of session entries
+2. Walk entries in order: user → assistant → tool calls/results
+3. Convert all Markdown content via `md2org()`
+4. Write `.org` file to cwd (or specified path)
 
 ## md2org conversion passes (in order)
 
@@ -43,7 +37,26 @@ This extension registers a `/export-org` command that writes the current pi sess
 Protected regions (code blocks, inline code) are tracked by offset range and
 skipped by later passes.
 
+## Org output structure
+
+- File-level `:PROPERTIES:` drawer — session path, cwd, token totals
+- `* You [timestamp]` — user turn headings
+- `* Assistant [timestamp]` — with `:PROPERTIES:` (model, provider, thinking)
+- Model/provider drawer only emitted on first turn and when either changes
+
+## Design decisions
+
+- Mirrors `gptel-md2org.el` pass-for-pass — keeps parity with Emacs-native export
+- Protected regions prevent passes from clobbering code block contents
+- Token accumulation is session-wide, stored at file level
+
+## Testing
+
+```bash
+node --test --experimental-strip-types extensions/export-org/md2org-test.ts
+```
+
 ## Conventions
 
 - Keep `md2org-test.ts` passing before committing changes to `md2org.ts`
-- `prepareArguments` / schema changes: update `package.json` version accordingly
+- `prepareArguments` / schema changes: update `package.json` version
