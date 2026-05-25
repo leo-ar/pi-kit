@@ -16,8 +16,7 @@
 
 import { complete } from "@earendil-works/pi-ai";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { convertToLlm, DynamicBorder, getMarkdownTheme, serializeConversation } from "@earendil-works/pi-coding-agent";
-import { Container, Markdown, matchesKey, Text } from "@earendil-works/pi-tui";
+import { convertToLlm, serializeConversation } from "@earendil-works/pi-coding-agent";
 
 import { extractFacts } from "./extraction.ts";
 import { compactPipeline } from "./pipeline.ts";
@@ -151,68 +150,16 @@ export default function smartCompact(pi: ExtensionAPI) {
       const messages = convertToLlm(agentMessages);
       const extraction = extractFacts(messages);
 
-      const modifiedList = [...extraction.files.modified].slice(-15);
-      const readList = [...extraction.files.read].slice(-10);
 
-      const md = [
-        `## Extraction Stats`,
-        "",
-        `**Goal:** ${extraction.goal || "(none detected)"}`,
-        "",
-        `### Files`,
-        `| Type | Count |`,
-        `|------|-------|`,
-        `| Modified | ${extraction.files.modified.size} |`,
-        `| Read-only | ${extraction.files.read.size} |`,
-        "",
-        modifiedList.length > 0
-          ? `**Modified:**\n${modifiedList.map((f) => `- \`${f}\``).join("\n")}`
-          : "",
-        readList.length > 0
-          ? `\n**Read-only:**\n${readList.map((f) => `- \`${f}\``).join("\n")}`
-          : "",
-        "",
-        `### Signals`,
-        `| Type | Count |`,
-        `|------|-------|`,
-        `| Errors | ${extraction.errors.length} |`,
-        `| Decisions | ${extraction.decisions.length} |`,
-        `| Constraints | ${extraction.constraints.length} |`,
-        "",
-        extraction.errors.length > 0
-          ? `**Recent errors:**\n${extraction.errors.slice(-3).map((e) => `- ${e}`).join("\n")}`
-          : "",
-        extraction.decisions.length > 0
-          ? `\n**Decisions:**\n${extraction.decisions.slice(-5).map((d) => `- ${d}`).join("\n")}`
-          : "",
-        extraction.constraints.length > 0
-          ? `\n**Constraints:**\n${extraction.constraints.map((c) => `- ${c}`).join("\n")}`
-          : "",
-      ]
-        .filter(Boolean)
-        .join("\n");
+      const summary = [
+        `${extraction.files.modified.size} modified`,
+        `${extraction.files.read.size} read`,
+        `${extraction.errors.length} errors`,
+        `${extraction.decisions.length} decisions`,
+        extraction.goal ? `goal: ${extraction.goal.slice(0, 60)}` : null,
+      ].filter(Boolean).join(", ");
 
-      await ctx.ui.custom((_tui, theme, _kb, done) => {
-        const container = new Container();
-        const border = new DynamicBorder((s: string) => theme.fg("accent", s));
-        const mdTheme = getMarkdownTheme();
-
-        container.addChild(border);
-        container.addChild(new Text(theme.fg("accent", theme.bold("smart-compact extraction")), 1, 0));
-        container.addChild(new Markdown(md, 1, 1, mdTheme));
-        container.addChild(new Text(theme.fg("dim", "Press Enter or Esc to close"), 1, 0));
-        container.addChild(border);
-
-        return {
-          render: (width: number) => container.render(width),
-          invalidate: () => container.invalidate(),
-          handleInput: (data: string) => {
-            if (matchesKey(data, "enter") || matchesKey(data, "escape")) {
-              done(undefined);
-            }
-          },
-        };
-      });
+      ctx.ui.notify(summary);
     },
   });
 }
