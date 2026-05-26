@@ -4,7 +4,7 @@
 
 ## Doing
 
-- [ ] Implement Elisp support via tree-sitter (web-tree-sitter + bundled WASM grammar)
+- [ ] Phase 1: Implement Elisp + PHP via tree-sitter (web-tree-sitter + bundled WASM grammars)
 
 ## Done
 
@@ -28,9 +28,10 @@
 
 ### Planned
 
+- [ ] Phase 2: Migrate TypeScript/JavaScript to tree-sitter (deferred — 1% error rate, 2.3MB grammar; re-evaluate after Phase 1)
 - [ ] Add language support: Org-mode — deferred (no prebuilt WASM, needs build step)
-- [ ] Analyze tree-sitter upgrade path — ✅ done, see notes/tree-sitter-analysis.md; verdict: use only for Elisp
-- [ ] Re-run benchmark after adding Elisp
+- [ ] Analyze tree-sitter upgrade path — ✅ done, see notes/tree-sitter-analysis.md
+- [ ] Re-run benchmark after Phase 1
 
 ### Surfaced
 

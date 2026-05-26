@@ -130,25 +130,30 @@ Key design points:
 
 ## Decision
 
-The analysis reveals **three viable paths**:
+**Path C (Phased migration), starting with Elisp + PHP.**
 
-### Path A: Elisp-only (original recommendation)
-- Add tree-sitter only for Elisp where regex fundamentally can't work
-- Keep regex for everything else
-- **Pro:** Minimal change, low risk
-- **Con:** Maintains two systems; doesn't fix known regex edge cases in TS/PHP
+### Phase 1 (now): Elisp + PHP via tree-sitter
+- Elisp: regex fundamentally can't work (balanced parens)
+- PHP: 17% error rate in real sessions — actively harmful
+- Total dep cost: 376KB runtime + 52KB elisp + 794KB php = ~1.2MB
 
-### Path B: Full retrofit
-- Replace ALL regex generators with one generic tree-sitter AST walker
-- Delete `block-end.ts` and all 11 language files
-- Replace with ~150 lines of generic walker + per-language config
-- **Pro:** 70% less code, perfect accuracy, eliminates block-end bugs, easier to add new languages
-- **Con:** 4.2MB dependency, grammar version coupling, 15x slower (but still <5ms)
+### Phase 2 (deferred): TypeScript/JavaScript
+- 1% error rate — livable, not harmful
+- 2.3MB grammar is the largest single file
+- Wait until Phase 1 proves the infrastructure, then re-evaluate
+- If wrong spans annoy in practice, pull the trigger with confidence
 
-### Path C: Phased migration
-1. Start with Elisp (tree-sitter, validates the infrastructure)
-2. Then migrate TypeScript (most-used, most edge cases in current regex)
-3. Evaluate: if quality + code reduction is worth it, continue with remaining languages
-4. Eventually remove regex entirely
+### Phase 3 (deferred): Org-mode
+- No prebuilt WASM, needs custom build step
+- Wait until tree-sitter infra is stable
 
-**Recommended: Present all three to user for decision.** The "right" answer depends on tolerance for dependency size vs. code simplicity.
+### Not planned: CSS, HTML, Go, Python, Rust, Ruby
+- CSS/HTML: regex works, 0% error in sessions
+- Go/Python: 0% error rate, indentation/brace semantics are simple
+- Rust/Ruby: no session data to measure, regex adequate
+
+### Rationale for deferring TS/JS
+- 99% accuracy is sufficient for outline purpose (agent decides what to read in detail)
+- 2.3MB grammar adds significant weight for marginal improvement
+- Phase 1 validates the walker pattern; TS/JS becomes trivial follow-up if needed
+- Re-run bench after Phase 1 and decide with data
