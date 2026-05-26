@@ -4,7 +4,7 @@
 
 ## Doing
 
-- [ ] Re-run benchmark after Phase 1 (validate PHP error rate dropped to 0%)
+_(nothing — Phase 1 complete)_
 
 ## Done
 
@@ -15,6 +15,7 @@
   - [x] PHP generator rewritten with tree-sitter (regex fallback); 5 edge-case tests proving correctness
   - [x] All 129 tests passing
   - [x] generateOutline() now async throughout
+  - [x] Benchmark validated: PHP error rate 17% → 0%, total savings 875KB → 1118KB (+28%)
 
 - [x] Add PHP, CSS, HTML support — +23% savings (875 KB total), PHP at 94% reduction
 - [x] Benchmark usefulness against existing pi sessions — **86.5% → 87.8% reduction** (875 KB saved across 69 files)
