@@ -1,7 +1,7 @@
 # AGENTS.md — export-org extension
 
 > For workflow, testing strategy, and conventions see the repo-level
-> [AGENTS.md](../../AGENTS.md).
+> [AGENTS.md](../AGENTS.md).
 
 ## Files
 
