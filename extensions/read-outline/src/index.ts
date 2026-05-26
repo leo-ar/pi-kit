@@ -28,9 +28,14 @@ export default function readOutlineExtension(pi: ExtensionAPI) {
   const outlinedFiles = new Set<string>();
   let savedBytes = 0;
 
+  function formatBytes(bytes: number): string {
+    if (bytes < 1024) return `${Math.floor(bytes)}B`;
+    if (bytes < 1024 * 1024) return `${Math.floor(bytes / 1024)}KB`;
+    return `${Math.floor(bytes / (1024 * 1024))}MB`;
+  }
+
   function updateStatus(ctx: { ui: { setStatus(key: string, text: string): void } }) {
-    const kb = (savedBytes / 1024).toFixed(1);
-    ctx.ui.setStatus("read-outline", `📐 ${kb}KB`);
+    ctx.ui.setStatus("read-outline", `📐 ${formatBytes(savedBytes)}`);
   }
 
   // Reset tracking on new session
