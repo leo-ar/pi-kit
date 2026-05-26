@@ -23,3 +23,5 @@
 ### Planned
 
 ### Surfaced
+
+- [ ] Decide on permanent load indicator strategy (status widget vs. silent, dev-only vs. always)
