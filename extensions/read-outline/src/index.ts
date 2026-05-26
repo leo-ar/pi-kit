@@ -26,16 +26,17 @@ export default function readOutlineExtension(pi: ExtensionAPI) {
   // If the agent reads the same file a second time without offset/limit,
   // it means it wants the full content — pass through.
   const outlinedFiles = new Set<string>();
-  let outlineCount = 0;
+  let savedBytes = 0;
 
   function updateStatus(ctx: { ui: { setStatus(key: string, text: string): void } }) {
-    ctx.ui.setStatus("read-outline", `📐 ${outlineCount}`);
+    const kb = (savedBytes / 1024).toFixed(1);
+    ctx.ui.setStatus("read-outline", `📐 ${kb}KB`);
   }
 
   // Reset tracking on new session
   pi.on("session_start", (_event, ctx) => {
     outlinedFiles.clear();
-    outlineCount = 0;
+    savedBytes = 0;
     updateStatus(ctx);
   });
 
@@ -73,7 +74,7 @@ export default function readOutlineExtension(pi: ExtensionAPI) {
 
     // Track that we outlined this file
     outlinedFiles.add(filePath);
-    outlineCount++;
+    savedBytes += textBlock.text.length - replacement.length;
     updateStatus(ctx);
 
     // Build replacement content
