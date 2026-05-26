@@ -29,7 +29,7 @@ export default function readOutlineExtension(pi: ExtensionAPI) {
   let outlineCount = 0;
 
   function updateStatus(ctx: { ui: { setStatus(key: string, text: string): void } }) {
-    ctx.ui.setStatus("read-outline", `📐 ${outlineCount} outlined`);
+    ctx.ui.setStatus("read-outline", `📐 ${outlineCount}`);
   }
 
   // Reset tracking on new session
