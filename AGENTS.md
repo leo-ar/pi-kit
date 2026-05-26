@@ -1,12 +1,23 @@
 # AGENTS.md — repo layout and conventions
 
-This repo contains pi extensions and skills.
+> This file defines your working constraints for this project. Follow these
+> rules exactly. Begin every session by reading this file and `notes/TODO.md`
+> to determine the active mode and current task.
+
+## Project Overview
+
+Personal collection of pi extensions and skills. Extensions register slash
+commands or event handlers that customize the pi coding agent. Skills are
+markdown instruction sets that teach agents reusable tasks. Consumed by the
+developer (Leo) via `pi install` or project-local `.pi/` placement.
 
 ## Top-level layout
 
 ```
-extensions/   pi extensions — each registers one or more slash commands
-skills/       pi skills — each teaches an agent a reusable task
+extensions/          pi extensions — each registers commands or behaviour
+skills/              pi skills — markdown instruction sets
+notes/               working notes, TODO, retros, analysis docs
+.pi/                 project-local pi config (SYSTEM.md, prompts)
 ```
 
 ## Extensions (`extensions/<name>/`)
@@ -106,3 +117,4 @@ _Negative Rule:_ If a function represents a basic 1:1 mapping ("X always maps to
 - **Peer dependency:** `@earendil-works/pi-coding-agent` (and `@earendil-works/pi-ai` where needed)
 - **License:** LGPL-3.0-or-later
 - **Formatting:** Prettier for markdown
+- **Architecture pattern:** Generators as effect systems — pure generator logic yields effect descriptions, thin imperative runners perform real I/O
