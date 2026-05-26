@@ -31,10 +31,16 @@ export default function contextPruner(pi: ExtensionAPI) {
       pruned: stats.pruned,
     };
 
-    const kbSaved = (totalSaved / 1024).toFixed(1);
+    function formatBytes(bytes: number): string {
+      if (bytes < 1024) return `${Math.floor(bytes)}B`;
+      if (bytes < 1024 * 1024) return `${Math.floor(bytes / 1024)}KB`;
+      return `${Math.floor(bytes / (1024 * 1024))}MB`;
+    }
+
+    const saved = formatBytes(totalSaved);
     ctx.ui.setStatus(
       "prune-stats",
-      `🪓 ${kbSaved}KB K${config.recentTurnsToKeep}`
+      `🪓 ${saved} K${config.recentTurnsToKeep}`
     );
 
     return { messages: pruned };

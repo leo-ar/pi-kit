@@ -1,0 +1,49 @@
+import type { OutlineEntry } from "./types.ts";
+import { detectLanguage } from "./utils.ts";
+import { generateTsOutline } from "./languages/typescript.ts";
+import { generatePythonOutline } from "./languages/python.ts";
+import { generateRustOutline } from "./languages/rust.ts";
+import { generateGoOutline } from "./languages/go.ts";
+import { generateJavaLikeOutline } from "./languages/java-like.ts";
+import { generateCOutline } from "./languages/c-cpp.ts";
+import { generateRubyOutline } from "./languages/ruby.ts";
+import { generatePhpOutline } from "./languages/php.ts";
+import { generateCssOutline } from "./languages/css.ts";
+import { generateHtmlOutline } from "./languages/html.ts";
+import { generateElispOutline } from "./languages/elisp.ts";
+import { generateGenericOutline } from "./languages/generic.ts";
+
+export async function generateOutline(lines: string[], filePath: string): Promise<OutlineEntry[]> {
+  const lang = detectLanguage(filePath);
+
+  switch (lang) {
+    case "typescript":
+    case "javascript":
+      return generateTsOutline(lines);
+    case "python":
+      return generatePythonOutline(lines);
+    case "rust":
+      return generateRustOutline(lines);
+    case "go":
+      return generateGoOutline(lines);
+    case "java":
+    case "kotlin":
+    case "csharp":
+      return generateJavaLikeOutline(lines);
+    case "c":
+    case "cpp":
+      return generateCOutline(lines);
+    case "ruby":
+      return generateRubyOutline(lines);
+    case "php":
+      return generatePhpOutline(lines);
+    case "css":
+      return generateCssOutline(lines);
+    case "html":
+      return generateHtmlOutline(lines);
+    case "elisp":
+      return generateElispOutline(lines);
+    default:
+      return generateGenericOutline(lines);
+  }
+}
