@@ -4,9 +4,17 @@
 
 ## Doing
 
-- [ ] Phase 1: Implement Elisp + PHP via tree-sitter (web-tree-sitter + bundled WASM grammars)
+- [ ] Re-run benchmark after Phase 1 (validate PHP error rate dropped to 0%)
 
 ## Done
+
+- [x] Phase 1: Implement Elisp + PHP via tree-sitter
+  - [x] Add web-tree-sitter@0.24.7 dep + bundle grammars (elisp 52KB, php 794KB)
+  - [x] Lazy parser singleton (src/tree-sitter/init.ts)
+  - [x] Elisp generator (10 tests): defun, defmacro, defvar, defcustom, defconst, defgroup, defface, define-*-mode
+  - [x] PHP generator rewritten with tree-sitter (regex fallback); 5 edge-case tests proving correctness
+  - [x] All 129 tests passing
+  - [x] generateOutline() now async throughout
 
 - [x] Add PHP, CSS, HTML support — +23% savings (875 KB total), PHP at 94% reduction
 - [x] Benchmark usefulness against existing pi sessions — **86.5% → 87.8% reduction** (875 KB saved across 69 files)
