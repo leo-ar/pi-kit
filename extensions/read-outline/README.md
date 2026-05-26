@@ -48,12 +48,12 @@ spans. All others use regex (sufficient at 0-1% error rate).
 
 Benchmarked across 14 real sessions (73 outlines):
 
-| Metric | Value |
-|--------|-------|
-| Total savings | 1118 KB |
-| Average reduction | 88% per outlined file |
-| PHP accuracy (tree-sitter) | 0% error rate (was 17% with regex) |
-| Elisp | New — 95 KB saved (regex can't parse s-expressions) |
+| Metric                     | Value                                               |
+| -------------------------- | --------------------------------------------------- |
+| Total savings              | 1118 KB                                             |
+| Average reduction          | 88% per outlined file                               |
+| PHP accuracy (tree-sitter) | 0% error rate (was 17% with regex)                  |
+| Elisp                      | New — 95 KB saved (regex can't parse s-expressions) |
 
 ## Commands
 
@@ -68,6 +68,7 @@ pi install git:github.com/leo-ar/pi-kit extensions/read-outline
 ```
 
 Or symlink for development:
+
 ```bash
 ln -s /path/to/pi-kit/extensions/read-outline ~/.pi/agent/extensions/read-outline
 ```

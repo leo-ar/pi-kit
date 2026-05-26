@@ -11,7 +11,7 @@ _(nothing — Phase 1 complete)_
 - [x] Phase 1: Implement Elisp + PHP via tree-sitter
   - [x] Add web-tree-sitter@0.24.7 dep + bundle grammars (elisp 52KB, php 794KB)
   - [x] Lazy parser singleton (src/tree-sitter/init.ts)
-  - [x] Elisp generator (10 tests): defun, defmacro, defvar, defcustom, defconst, defgroup, defface, define-*-mode
+  - [x] Elisp generator (10 tests): defun, defmacro, defvar, defcustom, defconst, defgroup, defface, define-\*-mode
   - [x] PHP generator rewritten with tree-sitter (regex fallback); 5 edge-case tests proving correctness
   - [x] All 129 tests passing
   - [x] generateOutline() now async throughout
