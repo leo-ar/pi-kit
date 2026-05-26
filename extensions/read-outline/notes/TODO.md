@@ -4,6 +4,8 @@
 
 ## Doing
 
+- [ ] Add language support: PHP, CSS, HTML (brace/tag-based, same pattern as existing generators)
+
 ## Done
 
 - [x] Benchmark usefulness against existing pi sessions — **86.5% reduction** on eligible reads (712 KB saved across 56 files, median 325 lines)

@@ -32,6 +32,9 @@ export function detectLanguage(filePath: string): Lang {
     ".rb": "ruby",
     ".swift": "swift",
     ".zig": "zig",
+    ".php": "php",
+    ".css": "css", ".scss": "css", ".less": "css",
+    ".html": "html", ".htm": "html", ".vue": "html", ".svelte": "html",
   };
   return map[ext] ?? "unknown";
 }

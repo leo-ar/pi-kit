@@ -7,6 +7,9 @@ import { generateGoOutline } from "./languages/go.ts";
 import { generateJavaLikeOutline } from "./languages/java-like.ts";
 import { generateCOutline } from "./languages/c-cpp.ts";
 import { generateRubyOutline } from "./languages/ruby.ts";
+import { generatePhpOutline } from "./languages/php.ts";
+import { generateCssOutline } from "./languages/css.ts";
+import { generateHtmlOutline } from "./languages/html.ts";
 import { generateGenericOutline } from "./languages/generic.ts";
 
 export function generateOutline(lines: string[], filePath: string): OutlineEntry[] {
@@ -31,6 +34,12 @@ export function generateOutline(lines: string[], filePath: string): OutlineEntry
       return generateCOutline(lines);
     case "ruby":
       return generateRubyOutline(lines);
+    case "php":
+      return generatePhpOutline(lines);
+    case "css":
+      return generateCssOutline(lines);
+    case "html":
+      return generateHtmlOutline(lines);
     default:
       return generateGenericOutline(lines);
   }

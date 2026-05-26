@@ -18,6 +18,9 @@ export const SUPPORTED_EXTENSIONS = new Set([
   ".rb",
   ".swift",
   ".zig",
+  ".php",
+  ".css", ".scss", ".less",
+  ".html", ".htm", ".vue", ".svelte",
 ]);
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -51,4 +54,7 @@ export type Lang =
   | "c" | "cpp"
   | "ruby"
   | "swift" | "zig"
+  | "php"
+  | "css"
+  | "html"
   | "unknown";
