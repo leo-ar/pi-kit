@@ -3,13 +3,13 @@ import assert from "node:assert/strict";
 import { generateOutline } from "../src/outline.ts";
 
 describe("generateOutline — TypeScript", () => {
-  it("detects exported function", () => {
+  it("detects exported function", async () => {
     const lines = [
       "export function greet(name: string) {",
       "  return `Hello ${name}`;",
       "}",
     ];
-    const entries = generateOutline(lines, "file.ts");
+    const entries = await generateOutline(lines, "file.ts");
     assert.equal(entries.length, 1);
     assert.equal(entries[0].kind, "fn");
     assert.equal(entries[0].name, "greet");
@@ -18,7 +18,7 @@ describe("generateOutline — TypeScript", () => {
     assert.equal(entries[0].exported, true);
   });
 
-  it("detects class with correct span", () => {
+  it("detects class with correct span", async () => {
     const lines = [
       "export class Foo {",
       "  bar() {",
@@ -26,7 +26,7 @@ describe("generateOutline — TypeScript", () => {
       "  }",
       "}",
     ];
-    const entries = generateOutline(lines, "file.ts");
+    const entries = await generateOutline(lines, "file.ts");
     assert.equal(entries.length, 1);
     assert.equal(entries[0].kind, "class");
     assert.equal(entries[0].name, "Foo");
@@ -34,7 +34,7 @@ describe("generateOutline — TypeScript", () => {
     assert.equal(entries[0].endLine, 5);
   });
 
-  it("detects interface and enum", () => {
+  it("detects interface and enum", async () => {
     const lines = [
       "export interface Config {",
       "  name: string;",
@@ -45,7 +45,7 @@ describe("generateOutline — TypeScript", () => {
       "  Inactive,",
       "}",
     ];
-    const entries = generateOutline(lines, "file.ts");
+    const entries = await generateOutline(lines, "file.ts");
     assert.equal(entries.length, 2);
     assert.equal(entries[0].kind, "interface");
     assert.equal(entries[0].name, "Config");
@@ -55,18 +55,18 @@ describe("generateOutline — TypeScript", () => {
     assert.equal(entries[1].exported, false);
   });
 
-  it("detects const declarations", () => {
+  it("detects const declarations", async () => {
     const lines = [
       "export const THRESHOLD = 100;",
     ];
-    const entries = generateOutline(lines, "file.ts");
+    const entries = await generateOutline(lines, "file.ts");
     assert.equal(entries.length, 1);
     assert.equal(entries[0].kind, "const");
     assert.equal(entries[0].name, "THRESHOLD");
     assert.equal(entries[0].exported, true);
   });
 
-  it("skips import lines", () => {
+  it("skips import lines", async () => {
     const lines = [
       'import { foo } from "./foo";',
       "",
@@ -74,18 +74,18 @@ describe("generateOutline — TypeScript", () => {
       "  return foo();",
       "}",
     ];
-    const entries = generateOutline(lines, "file.ts");
+    const entries = await generateOutline(lines, "file.ts");
     assert.equal(entries.length, 1);
     assert.equal(entries[0].name, "bar");
   });
 
-  it("detects async function", () => {
+  it("detects async function", async () => {
     const lines = [
       "export async function fetchData() {",
       "  return await fetch('/api');",
       "}",
     ];
-    const entries = generateOutline(lines, "file.mts");
+    const entries = await generateOutline(lines, "file.mts");
     assert.equal(entries.length, 1);
     assert.equal(entries[0].kind, "fn");
     assert.equal(entries[0].name, "fetchData");
@@ -93,7 +93,7 @@ describe("generateOutline — TypeScript", () => {
 });
 
 describe("generateOutline — Python", () => {
-  it("detects top-level class and function", () => {
+  it("detects top-level class and function", async () => {
     const lines = [
       "class Parser:",
       "    def __init__(self):",
@@ -102,7 +102,7 @@ describe("generateOutline — Python", () => {
       "def main():",
       "    p = Parser()",
     ];
-    const entries = generateOutline(lines, "file.py");
+    const entries = await generateOutline(lines, "file.py");
     assert.equal(entries.length, 2);
     assert.equal(entries[0].kind, "class");
     assert.equal(entries[0].name, "Parser");
@@ -110,7 +110,7 @@ describe("generateOutline — Python", () => {
     assert.equal(entries[1].name, "main");
   });
 
-  it("marks underscore functions as non-exported", () => {
+  it("marks underscore functions as non-exported", async () => {
     const lines = [
       "def _helper():",
       "    pass",
@@ -118,17 +118,17 @@ describe("generateOutline — Python", () => {
       "def public_api():",
       "    pass",
     ];
-    const entries = generateOutline(lines, "file.py");
+    const entries = await generateOutline(lines, "file.py");
     assert.equal(entries[0].exported, false);
     assert.equal(entries[1].exported, true);
   });
 
-  it("detects UPPER_CASE constants", () => {
+  it("detects UPPER_CASE constants", async () => {
     const lines = [
       "MAX_RETRIES = 5",
       "DEFAULT_TIMEOUT = 30",
     ];
-    const entries = generateOutline(lines, "file.py");
+    const entries = await generateOutline(lines, "file.py");
     assert.equal(entries.length, 2);
     assert.equal(entries[0].kind, "const");
     assert.equal(entries[0].name, "MAX_RETRIES");
@@ -136,7 +136,7 @@ describe("generateOutline — Python", () => {
 });
 
 describe("generateOutline — Rust", () => {
-  it("detects pub fn and struct", () => {
+  it("detects pub fn and struct", async () => {
     const lines = [
       "pub fn process(input: &str) -> Result<()> {",
       "    Ok(())",
@@ -146,7 +146,7 @@ describe("generateOutline — Rust", () => {
       "    name: String,",
       "}",
     ];
-    const entries = generateOutline(lines, "file.rs");
+    const entries = await generateOutline(lines, "file.rs");
     assert.equal(entries.length, 2);
     assert.equal(entries[0].kind, "fn");
     assert.equal(entries[0].name, "process");
@@ -155,7 +155,7 @@ describe("generateOutline — Rust", () => {
     assert.equal(entries[1].name, "Config");
   });
 
-  it("detects impl and trait", () => {
+  it("detects impl and trait", async () => {
     const lines = [
       "trait Readable {",
       "    fn read(&self) -> Vec<u8>;",
@@ -167,7 +167,7 @@ describe("generateOutline — Rust", () => {
       "    }",
       "}",
     ];
-    const entries = generateOutline(lines, "file.rs");
+    const entries = await generateOutline(lines, "file.rs");
     assert.equal(entries.length, 2);
     assert.equal(entries[0].kind, "trait");
     assert.equal(entries[0].name, "Readable");
@@ -177,7 +177,7 @@ describe("generateOutline — Rust", () => {
 });
 
 describe("generateOutline — Go", () => {
-  it("detects exported and unexported functions", () => {
+  it("detects exported and unexported functions", async () => {
     const lines = [
       "func ProcessData(input []byte) error {",
       "    return nil",
@@ -187,7 +187,7 @@ describe("generateOutline — Go", () => {
       "    return 0",
       "}",
     ];
-    const entries = generateOutline(lines, "file.go");
+    const entries = await generateOutline(lines, "file.go");
     assert.equal(entries.length, 2);
     assert.equal(entries[0].name, "ProcessData");
     assert.equal(entries[0].exported, true);
@@ -195,13 +195,13 @@ describe("generateOutline — Go", () => {
     assert.equal(entries[1].exported, false);
   });
 
-  it("detects type struct", () => {
+  it("detects type struct", async () => {
     const lines = [
       "type Config struct {",
       "    Name string",
       "}",
     ];
-    const entries = generateOutline(lines, "file.go");
+    const entries = await generateOutline(lines, "file.go");
     assert.equal(entries.length, 1);
     assert.equal(entries[0].kind, "struct");
     assert.equal(entries[0].name, "Config");
@@ -209,7 +209,7 @@ describe("generateOutline — Go", () => {
 });
 
 describe("generateOutline — Ruby", () => {
-  it("detects class and method", () => {
+  it("detects class and method", async () => {
     const lines = [
       "class Parser",
       "  def parse(input)",
@@ -217,7 +217,7 @@ describe("generateOutline — Ruby", () => {
       "  end",
       "end",
     ];
-    const entries = generateOutline(lines, "file.rb");
+    const entries = await generateOutline(lines, "file.rb");
     assert.equal(entries.length, 2);
     assert.equal(entries[0].kind, "class");
     assert.equal(entries[0].name, "Parser");
@@ -225,7 +225,7 @@ describe("generateOutline — Ruby", () => {
     assert.equal(entries[1].name, "parse");
   });
 
-  it("detects module", () => {
+  it("detects module", async () => {
     const lines = [
       "module Utils",
       "  def self.format(s)",
@@ -233,7 +233,7 @@ describe("generateOutline — Ruby", () => {
       "  end",
       "end",
     ];
-    const entries = generateOutline(lines, "file.rb");
+    const entries = await generateOutline(lines, "file.rb");
     assert.equal(entries.length, 2);
     assert.equal(entries[0].kind, "module");
     assert.equal(entries[0].name, "Utils");
@@ -243,7 +243,7 @@ describe("generateOutline — Ruby", () => {
 });
 
 describe("generateOutline — C/C++", () => {
-  it("detects struct and function", () => {
+  it("detects struct and function", async () => {
     const lines = [
       "struct Point {",
       "    int x;",
@@ -254,7 +254,7 @@ describe("generateOutline — C/C++", () => {
       "    return a + b;",
       "}",
     ];
-    const entries = generateOutline(lines, "file.c");
+    const entries = await generateOutline(lines, "file.c");
     assert.equal(entries.length, 2);
     assert.equal(entries[0].kind, "struct");
     assert.equal(entries[0].name, "Point");
@@ -264,7 +264,7 @@ describe("generateOutline — C/C++", () => {
 });
 
 describe("generateOutline — Generic fallback", () => {
-  it("detects function-like and class-like patterns", () => {
+  it("detects function-like and class-like patterns", async () => {
     const lines = [
       "pub fn handle(req: Request) {",
       "    respond(req)",
@@ -274,7 +274,7 @@ describe("generateOutline — Generic fallback", () => {
       "    path: String",
       "}",
     ];
-    const entries = generateOutline(lines, "file.zig");
+    const entries = await generateOutline(lines, "file.zig");
     assert.equal(entries.length, 2);
     assert.equal(entries[0].kind, "fn");
     assert.equal(entries[0].name, "handle");

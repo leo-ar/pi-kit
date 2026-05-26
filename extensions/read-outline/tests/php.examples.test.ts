@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { generatePhpOutline } from "../src/languages/php.ts";
 
 describe("generatePhpOutline — examples", () => {
-  it("detects a top-level function", () => {
+  it("detects a top-level function", async () => {
     const lines = [
       "<?php",
       "",
@@ -11,7 +11,7 @@ describe("generatePhpOutline — examples", () => {
       '    echo "Hello, $name!";',
       "}",
     ];
-    const result = generatePhpOutline(lines);
+    const result = await generatePhpOutline(lines);
     assert.equal(result.length, 1);
     assert.equal(result[0].kind, "fn");
     assert.equal(result[0].name, "hello");
@@ -20,7 +20,7 @@ describe("generatePhpOutline — examples", () => {
     assert.equal(result[0].exported, true);
   });
 
-  it("detects class with methods", () => {
+  it("detects class with methods", async () => {
     const lines = [
       "<?php",
       "",
@@ -34,7 +34,7 @@ describe("generatePhpOutline — examples", () => {
       "    }",
       "}",
     ];
-    const result = generatePhpOutline(lines);
+    const result = await generatePhpOutline(lines);
     // class + 2 methods
     assert.ok(result.length >= 1);
     const cls = result.find(e => e.kind === "class");
@@ -51,7 +51,7 @@ describe("generatePhpOutline — examples", () => {
     assert.equal(methods[1].exported, false);
   });
 
-  it("detects interface", () => {
+  it("detects interface", async () => {
     const lines = [
       "<?php",
       "",
@@ -59,13 +59,13 @@ describe("generatePhpOutline — examples", () => {
       "    public function render(): string;",
       "}",
     ];
-    const result = generatePhpOutline(lines);
+    const result = await generatePhpOutline(lines);
     const iface = result.find(e => e.kind === "interface");
     assert.ok(iface);
     assert.equal(iface!.name, "Renderable");
   });
 
-  it("detects trait", () => {
+  it("detects trait", async () => {
     const lines = [
       "<?php",
       "",
@@ -75,13 +75,13 @@ describe("generatePhpOutline — examples", () => {
       "    }",
       "}",
     ];
-    const result = generatePhpOutline(lines);
+    const result = await generatePhpOutline(lines);
     const trait = result.find(e => e.kind === "trait");
     assert.ok(trait);
     assert.equal(trait!.name, "HasTimestamps");
   });
 
-  it("detects namespace", () => {
+  it("detects namespace", async () => {
     const lines = [
       "<?php",
       "",
@@ -90,13 +90,13 @@ describe("generatePhpOutline — examples", () => {
       "class HomeController {",
       "}",
     ];
-    const result = generatePhpOutline(lines);
+    const result = await generatePhpOutline(lines);
     const ns = result.find(e => e.kind === "namespace");
     assert.ok(ns);
     assert.equal(ns!.name, "App\\Http\\Controllers");
   });
 
-  it("detects enum (PHP 8.1)", () => {
+  it("detects enum (PHP 8.1)", async () => {
     const lines = [
       "<?php",
       "",
@@ -105,27 +105,27 @@ describe("generatePhpOutline — examples", () => {
       "    case Inactive;",
       "}",
     ];
-    const result = generatePhpOutline(lines);
+    const result = await generatePhpOutline(lines);
     const en = result.find(e => e.kind === "enum");
     assert.ok(en);
     assert.equal(en!.name, "Status");
   });
 
-  it("detects define() constants", () => {
+  it("detects define() constants", async () => {
     const lines = [
       "<?php",
       "",
       "define('APP_VERSION', '1.0.0');",
       "define('MAX_RETRIES', 3);",
     ];
-    const result = generatePhpOutline(lines);
+    const result = await generatePhpOutline(lines);
     assert.equal(result.length, 2);
     assert.equal(result[0].kind, "const");
     assert.equal(result[0].name, "APP_VERSION");
     assert.equal(result[1].name, "MAX_RETRIES");
   });
 
-  it("detects abstract class", () => {
+  it("detects abstract class", async () => {
     const lines = [
       "<?php",
       "",
@@ -133,13 +133,13 @@ describe("generatePhpOutline — examples", () => {
       "    abstract protected function tableName(): string;",
       "}",
     ];
-    const result = generatePhpOutline(lines);
+    const result = await generatePhpOutline(lines);
     const cls = result.find(e => e.kind === "class");
     assert.ok(cls);
     assert.equal(cls!.name, "BaseModel");
   });
 
-  it("detects final class", () => {
+  it("detects final class", async () => {
     const lines = [
       "<?php",
       "",
@@ -147,7 +147,7 @@ describe("generatePhpOutline — examples", () => {
       "    public const DB_HOST = 'localhost';",
       "}",
     ];
-    const result = generatePhpOutline(lines);
+    const result = await generatePhpOutline(lines);
     const cls = result.find(e => e.kind === "class");
     assert.ok(cls);
     assert.equal(cls!.name, "Config");

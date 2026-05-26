@@ -21,6 +21,7 @@ export const SUPPORTED_EXTENSIONS = new Set([
   ".php",
   ".css", ".scss", ".less",
   ".html", ".htm", ".vue", ".svelte",
+  ".el",
 ]);
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -57,4 +58,5 @@ export type Lang =
   | "php"
   | "css"
   | "html"
+  | "elisp"
   | "unknown";

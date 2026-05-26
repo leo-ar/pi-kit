@@ -10,9 +10,10 @@ import { generateRubyOutline } from "./languages/ruby.ts";
 import { generatePhpOutline } from "./languages/php.ts";
 import { generateCssOutline } from "./languages/css.ts";
 import { generateHtmlOutline } from "./languages/html.ts";
+import { generateElispOutline } from "./languages/elisp.ts";
 import { generateGenericOutline } from "./languages/generic.ts";
 
-export function generateOutline(lines: string[], filePath: string): OutlineEntry[] {
+export async function generateOutline(lines: string[], filePath: string): Promise<OutlineEntry[]> {
   const lang = detectLanguage(filePath);
 
   switch (lang) {
@@ -40,6 +41,8 @@ export function generateOutline(lines: string[], filePath: string): OutlineEntry
       return generateCssOutline(lines);
     case "html":
       return generateHtmlOutline(lines);
+    case "elisp":
+      return generateElispOutline(lines);
     default:
       return generateGenericOutline(lines);
   }

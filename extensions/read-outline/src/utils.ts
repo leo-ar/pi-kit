@@ -35,6 +35,7 @@ export function detectLanguage(filePath: string): Lang {
     ".php": "php",
     ".css": "css", ".scss": "css", ".less": "css",
     ".html": "html", ".htm": "html", ".vue": "html", ".svelte": "html",
+    ".el": "elisp",
   };
   return map[ext] ?? "unknown";
 }

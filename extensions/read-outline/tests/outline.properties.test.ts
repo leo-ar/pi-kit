@@ -72,10 +72,10 @@ const filePaths: [string, fc.Arbitrary<string[]>][] = [
 
 describe("generateOutline — property: valid line ranges", () => {
   for (const [path, arb] of filePaths) {
-    it(`all entries have startLine >= 1 and endLine <= totalLines (${path})`, () => {
-      fc.assert(
-        fc.property(arb, (lines) => {
-          const entries = generateOutline(lines, path);
+    it(`all entries have startLine >= 1 and endLine <= totalLines (${path})`, async () => {
+      await fc.assert(
+        fc.asyncProperty(arb, async (lines) => {
+          const entries = await generateOutline(lines, path);
           for (const entry of entries) {
             assert.ok(entry.startLine >= 1, `startLine ${entry.startLine} < 1`);
             assert.ok(entry.endLine >= entry.startLine, `endLine ${entry.endLine} < startLine ${entry.startLine}`);
@@ -90,10 +90,10 @@ describe("generateOutline — property: valid line ranges", () => {
 
 describe("generateOutline — property: entries in source order", () => {
   for (const [path, arb] of filePaths) {
-    it(`entries are non-decreasing by startLine (${path})`, () => {
-      fc.assert(
-        fc.property(arb, (lines) => {
-          const entries = generateOutline(lines, path);
+    it(`entries are non-decreasing by startLine (${path})`, async () => {
+      await fc.assert(
+        fc.asyncProperty(arb, async (lines) => {
+          const entries = await generateOutline(lines, path);
           for (let i = 1; i < entries.length; i++) {
             assert.ok(
               entries[i].startLine >= entries[i - 1].startLine,
@@ -109,10 +109,10 @@ describe("generateOutline — property: entries in source order", () => {
 
 describe("generateOutline — property: names are non-empty identifiers", () => {
   for (const [path, arb] of filePaths) {
-    it(`every entry.name matches /^\\w+[?!]?$/ (${path})`, () => {
-      fc.assert(
-        fc.property(arb, (lines) => {
-          const entries = generateOutline(lines, path);
+    it(`every entry.name matches /^\\w+[?!]?$/ (${path})`, async () => {
+      await fc.assert(
+        fc.asyncProperty(arb, async (lines) => {
+          const entries = await generateOutline(lines, path);
           for (const entry of entries) {
             assert.ok(entry.name.length > 0, "name is empty");
             assert.match(entry.name, /^\w+[?!]?$/, `name "${entry.name}" is not a valid identifier`);
@@ -126,10 +126,10 @@ describe("generateOutline — property: names are non-empty identifiers", () => 
 
 describe("generateOutline — property: no duplicate spans", () => {
   for (const [path, arb] of filePaths) {
-    it(`no two entries share identical [startLine, endLine] (${path})`, () => {
-      fc.assert(
-        fc.property(arb, (lines) => {
-          const entries = generateOutline(lines, path);
+    it(`no two entries share identical [startLine, endLine] (${path})`, async () => {
+      await fc.assert(
+        fc.asyncProperty(arb, async (lines) => {
+          const entries = await generateOutline(lines, path);
           const spans = new Set<string>();
           for (const entry of entries) {
             const key = `${entry.startLine}:${entry.endLine}`;

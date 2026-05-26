@@ -11,7 +11,7 @@
  * - Only activates on full-file reads (no offset/limit specified)
  * - Passes through small files unchanged
  * - Passes through non-source files unchanged (markdown, json, config, etc.)
- * - Regex-based outline (no WASM dependency for v0.2; upgradeable to tree-sitter)
+ * - Regex-based outline for brace languages; tree-sitter for Elisp and PHP
  * - Preserves file header (imports/requires) for context
  */
 
@@ -74,16 +74,16 @@ export default function readOutlineExtension(pi: ExtensionAPI) {
     if (lines.length <= LINE_THRESHOLD) return {};
 
     // Generate outline
-    const outline = generateOutline(lines, filePath);
+    const outline = await generateOutline(lines, filePath);
     if (outline.length === 0) return {};
+
+    // Build replacement content
+    const replacement = formatOutlineResult(filePath, lines, outline);
 
     // Track that we outlined this file
     outlinedFiles.add(filePath);
     savedBytes += textBlock.text.length - replacement.length;
     updateStatus(ctx);
-
-    // Build replacement content
-    const replacement = formatOutlineResult(filePath, lines, outline);
 
     return {
       content: [{ type: "text", text: replacement }],

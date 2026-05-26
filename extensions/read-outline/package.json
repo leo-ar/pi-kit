@@ -3,9 +3,13 @@
   "version": "0.2.0",
   "type": "module",
   "description": "Intercepts full-file reads and returns structural outlines for large files, guiding the agent to use targeted offset/limit re-reads. Zero tool registration overhead.",
-  "keywords": ["pi-package"],
+  "keywords": [
+    "pi-package"
+  ],
   "license": "MIT",
-  "files": ["src/"],
+  "files": [
+    "src/"
+  ],
   "scripts": {
     "test": "node --import tsx --test tests/**/*.test.ts"
   },
@@ -17,6 +21,11 @@
     "@earendil-works/pi-coding-agent": "*"
   },
   "pi": {
-    "extensions": ["./index.ts"]
+    "extensions": [
+      "./index.ts"
+    ]
+  },
+  "dependencies": {
+    "web-tree-sitter": "^0.24.7"
   }
 }
