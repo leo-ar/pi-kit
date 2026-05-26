@@ -8,7 +8,8 @@
 
 ## Done
 
-- [x] Benchmark usefulness against existing pi sessions — **86.5% reduction** on eligible reads (712 KB saved across 56 files, median 325 lines)
+- [x] Add PHP, CSS, HTML support — +23% savings (875 KB total), PHP at 94% reduction
+- [x] Benchmark usefulness against existing pi sessions — **86.5% → 87.8% reduction** (875 KB saved across 69 files)
 - [x] feat/refactor-testable — Extract monolith into testable modules + add test suite
   1. [x] Set up test infrastructure (package.json: tsx, fast-check, node --test script)
   2. [x] Extract `src/types.ts` (OutlineEntry, ReadInput, TextContent, Lang, constants)
@@ -27,9 +28,9 @@
 
 ### Planned
 
-- [ ] Add language support: PHP, CSS, HTML, Emacs Lisp, Org-mode — **high impact**: funnel bottleneck is "supported ext" (only 11% of reads); more languages = more savings
+- [ ] Add language support: Emacs Lisp, Org-mode — **different paradigms**, design needed
 - [ ] Analyze tree-sitter upgrade path — consider reusing Emacs tree-sitter grammars to reduce redundancy
-- [ ] Benchmark usefulness against existing pi sessions (read-only — never modify sessions) — ✅ done, re-run after adding languages
+- [ ] Re-run benchmark after adding Elisp/Org-mode
 
 ### Surfaced
 
