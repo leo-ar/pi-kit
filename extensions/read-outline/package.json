@@ -1,0 +1,15 @@
+{
+  "name": "pi-read-outline",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Intercepts full-file reads and returns structural outlines for large files, guiding the agent to use targeted offset/limit re-reads. Zero tool registration overhead.",
+  "keywords": ["pi-package"],
+  "license": "MIT",
+  "files": ["index.ts"],
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "pi": {
+    "extensions": ["./index.ts"]
+  }
+}
