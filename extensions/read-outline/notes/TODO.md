@@ -4,7 +4,7 @@
 
 ## Doing
 
-- [ ] Analyze tree-sitter integration: feasibility, cost, and strategy for Elisp + Org-mode (and retrofit potential)
+- [ ] Implement Elisp support via tree-sitter (web-tree-sitter + bundled WASM grammar)
 
 ## Done
 
@@ -28,9 +28,9 @@
 
 ### Planned
 
-- [ ] Add language support: Emacs Lisp, Org-mode — **different paradigms**, design needed
-- [ ] Analyze tree-sitter upgrade path — consider reusing Emacs tree-sitter grammars to reduce redundancy
-- [ ] Re-run benchmark after adding Elisp/Org-mode
+- [ ] Add language support: Org-mode — deferred (no prebuilt WASM, needs build step)
+- [ ] Analyze tree-sitter upgrade path — ✅ done, see notes/tree-sitter-analysis.md; verdict: use only for Elisp
+- [ ] Re-run benchmark after adding Elisp
 
 ### Surfaced
 
