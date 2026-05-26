@@ -11,7 +11,11 @@ A pi coding agent extension that intercepts full-file `read` tool results and re
 ## Repository Layout
 
 ```
-.                          # Extension root
+src/                       # Source modules
+src/languages/             # Per-language outline generators
+tests/                     # Test suite (node:test + fast-check)
+notes/                     # TODO, retrospectives
+.pi/prompts/               # Workflow prompt templates
 ```
 
 ## Development Workflow
@@ -69,7 +73,7 @@ _Negative Rule:_ If a function represents a basic 1:1 mapping ("X always maps to
 ## Conventions
 
 - **Language:** TypeScript (ESM)
-- **Test runner:** `npm test`
+- **Test runner:** `npm test` (node --test + tsx + fast-check)
 - **Module type:** `"type": "module"` in package.json
 - **Peer dependency:** `@earendil-works/pi-coding-agent`
-- **Single-file architecture:** All logic lives in `index.ts`
+- **Architecture:** Modular `src/` — thin entry point, logic in dedicated modules
