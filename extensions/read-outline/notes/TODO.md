@@ -22,6 +22,10 @@
 
 ### Planned
 
+- [ ] Add language support: PHP, CSS, HTML, Emacs Lisp, Org-mode
+- [ ] Analyze tree-sitter upgrade path — consider reusing Emacs tree-sitter grammars to reduce redundancy
+- [ ] Benchmark usefulness against existing pi sessions (read-only — never modify sessions)
+
 ### Surfaced
 
 - [ ] Decide on permanent load indicator strategy (status widget vs. silent, dev-only vs. always)
