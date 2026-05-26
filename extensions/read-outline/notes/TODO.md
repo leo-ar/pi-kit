@@ -4,7 +4,7 @@
 
 ## Doing
 
-- [ ] Add language support: PHP, CSS, HTML (brace/tag-based, same pattern as existing generators)
+- [ ] Analyze tree-sitter integration: feasibility, cost, and strategy for Elisp + Org-mode (and retrofit potential)
 
 ## Done
 
