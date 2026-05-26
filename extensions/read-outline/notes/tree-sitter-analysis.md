@@ -39,17 +39,64 @@ Walking is trivial: iterate `root.childCount`, match by `node.type`, extract `ch
 
 ## Why NOT retrofit tree-sitter for all languages?
 
-| Factor | Regex (current) | Tree-sitter |
-|--------|----------------|-------------|
-| PHP/CSS/HTML accuracy | Good enough (94%/87% reduction) | Marginally better |
-| Startup latency | 0ms | +18ms per new grammar |
-| Dependency weight | 0 | +376KB + grammar WASMs |
-| Maintenance | Own code, easy to tweak | Grammar version coupling |
-| Parsing edge cases | Occasionally wrong block-end | Perfect |
+### Performance: Regex is 15x faster
 
-**The regex approach works well for brace-based languages.** Adding tree-sitter for PHP/CSS/HTML would add complexity and dep weight for marginal improvement. Our bench shows 87-94% reduction already.
+| Metric | Regex | Tree-sitter | Ratio |
+|--------|-------|-------------|-------|
+| Parse 630 lines TS (avg 100 runs) | 0.15ms | 2.31ms | 15x slower |
+| Memory per parse | ~0 (no AST) | ~1KB/tree | — |
+| Cold start (grammar load) | 0ms | +2-8ms per grammar | — |
 
-**Elisp is different:** parenthesized syntax with no visual block delimiters makes regex brittle. A regex `(defun` approach can't reliably find the end of a form without counting balanced parens — which is essentially reimplementing a parser. Tree-sitter does this natively.
+Both are well within the 50ms budget. **Speed is not a differentiator.**
+
+### Accuracy: Tree-sitter IS better for edge cases
+
+Hard cases where regex struggles but tree-sitter is perfect:
+
+| Pattern | Regex | Tree-sitter |
+|---------|-------|-------------|
+| Multi-line signatures | ⚠️ May miss or wrong end-line | ✅ Exact |
+| Braces inside type annotations | ⚠️ `findBlockEnd` confused | ✅ Exact |
+| Arrow fn assigned to `const` | ⚠️ Often missed | ✅ Exact |
+| Complex generics `<T extends { }>` | ⚠️ Brace counting broken | ✅ Exact |
+| Overloaded signatures | ⚠️ May count wrong | ✅ Distinct nodes |
+| Nested objects in `const =` | ⚠️ End-line wrong | ✅ Exact |
+
+These edge cases **do occur in real code** — especially in TypeScript.
+
+### Code simplification
+
+| Approach | Lines of code | Maintenance |
+|----------|---------------|-------------|
+| Current regex (all langs) | 575 lines (11 files + block-end) | Each language is bespoke regex |
+| Tree-sitter (all langs) | ~150 lines (generic walker + config) | One generic AST walk, per-lang config table |
+| Hybrid (regex for most, TS for some) | ~650 lines | Two systems to maintain |
+
+A tree-sitter-for-all approach would:
+- **Eliminate `block-end.ts` entirely** (79 lines) — AST gives exact spans
+- **Replace each language file** with a small config: "which node types are outline-worthy?"
+- **Reduce total code by ~70%** for equivalent or better results
+
+### Dependency weight
+
+| What we'd bundle | Size |
+|------------------|------|
+| `web-tree-sitter` runtime | 376KB |
+| Grammars we use (elisp+css+php+html+ts+js) | 3.8MB |
+| **Grammars if only elisp** | 52KB |
+
+3.8MB for all grammars is significant for an extension. But: these are static `.wasm` files loaded lazily on demand — only the grammar for the current file's language loads.
+
+### Summary table
+
+| Factor | Regex | Tree-sitter all | Tree-sitter elisp-only |
+|--------|-------|-----------------|------------------------|
+| Speed | 0.15ms | 2.3ms | 2ms (elisp only) |
+| Accuracy | Good (87-94% reduction) | Perfect spans | Perfect (elisp only) |
+| Code size | 575 lines | ~150 lines | +50 lines on top of regex |
+| Dep weight | 0 | 4.2MB | 428KB |
+| Maintenance | 11 bespoke files | 1 generic walker | Hybrid: two systems |
+| Block-end bugs | Occasional | None | None (elisp only) |
 
 ## Org-mode Status
 
@@ -83,8 +130,25 @@ Key design points:
 
 ## Decision
 
-1. ✅ Add `web-tree-sitter` as dependency
-2. ✅ Bundle `tree-sitter-elisp.wasm` (52KB)
-3. ✅ Implement Elisp outline via tree-sitter
-4. ⏸️ Org-mode: defer (no prebuilt WASM, needs build step)
-5. ❌ Don't retrofit regex languages to tree-sitter (not worth the cost)
+The analysis reveals **three viable paths**:
+
+### Path A: Elisp-only (original recommendation)
+- Add tree-sitter only for Elisp where regex fundamentally can't work
+- Keep regex for everything else
+- **Pro:** Minimal change, low risk
+- **Con:** Maintains two systems; doesn't fix known regex edge cases in TS/PHP
+
+### Path B: Full retrofit
+- Replace ALL regex generators with one generic tree-sitter AST walker
+- Delete `block-end.ts` and all 11 language files
+- Replace with ~150 lines of generic walker + per-language config
+- **Pro:** 70% less code, perfect accuracy, eliminates block-end bugs, easier to add new languages
+- **Con:** 4.2MB dependency, grammar version coupling, 15x slower (but still <5ms)
+
+### Path C: Phased migration
+1. Start with Elisp (tree-sitter, validates the infrastructure)
+2. Then migrate TypeScript (most-used, most edge cases in current regex)
+3. Evaluate: if quality + code reduction is worth it, continue with remaining languages
+4. Eventually remove regex entirely
+
+**Recommended: Present all three to user for decision.** The "right" answer depends on tolerance for dependency size vs. code simplicity.
