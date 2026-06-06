@@ -59,6 +59,10 @@ Benchmarked across 14 real sessions (73 outlines):
 
 Status bar auto-updates: `📐 8KB`
 
+The status widget is live-process state: it resets on pi restart or `/reload`.
+Use `npx tsx bench.ts` to replay saved sessions when you want historical
+aggregate savings.
+
 No slash commands — the extension is fully automatic.
 
 ## Install

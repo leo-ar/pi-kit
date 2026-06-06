@@ -8,6 +8,7 @@ _(nothing — Phase 1 complete)_
 
 ## Done
 
+- [x] Document status widget reset behavior (live-process state; use benchmark replay for historical savings)
 - [x] Phase 1: Implement Elisp + PHP via tree-sitter
   - [x] Add web-tree-sitter@0.24.7 dep + bundle grammars (elisp 52KB, php 794KB)
   - [x] Lazy parser singleton (src/tree-sitter/init.ts)

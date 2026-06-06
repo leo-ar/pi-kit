@@ -44,7 +44,7 @@ notes/                     TODO, retrospectives, tree-sitter analysis
 - Regex for TS/JS/Go/Rust/Python/Ruby/CSS/HTML — 0-1% error rate, no grammar overhead
 - Tree-sitter is lazy-loaded (18ms cold, 2.3ms warm) — only initializes on first PHP/Elisp read
 - Graceful fallback: if WASM fails, PHP falls back to regex (`php-regex.ts`)
-- Status widget shows cumulative savings: `📐 8KB`
+- Status widget shows live-process cumulative savings: `📐 8KB` (resets on restart or `/reload`; use `bench.ts` for historical session replay)
 
 ## Testing
 
