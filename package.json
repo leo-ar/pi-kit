@@ -3,6 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "check:models": "node scripts/check-model-access.mjs",
+    "check:models:live": "node scripts/check-model-access.mjs --live",
     "test": "node --test --experimental-strip-types 'extensions/**/*.test.ts'",
     "test:ci": "node --test --experimental-strip-types 'extensions/**/*.test.ts'"
   },
