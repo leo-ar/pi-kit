@@ -6,20 +6,32 @@ const PROMPT = "Reply with exactly: OK";
 
 function listModels() {
   const result = spawnSync("pi", ["--list-models"], { encoding: "utf8" });
+  const output = `${result.stdout || ""}\n${result.stderr || ""}`;
   if (result.status !== 0) {
-    console.error(result.stderr || result.stdout);
+    console.error(output.trim());
     process.exit(result.status ?? 1);
   }
 
-  return result.stdout
+  const models = output
     .split("\n")
     .slice(1) // header
     .map((line) => line.trim())
     .filter(Boolean)
+    .filter((line) => !line.startsWith("provider "))
+    .filter((line) => /^[a-z0-9-]+\s+\S+/i.test(line))
     .map((line) => {
       const [provider, model] = line.split(/\s+/);
       return `${provider}/${model}`;
     });
+
+  if (models.length === 0) {
+    console.error("No models parsed from `pi --list-models` output.");
+    console.error("Raw output:");
+    console.error(output.trim() || "<empty>");
+    process.exit(1);
+  }
+
+  return models;
 }
 
 function probe(model) {
