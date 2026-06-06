@@ -10,6 +10,16 @@ commands or event handlers that customize the pi coding agent. Skills are
 markdown instruction sets that teach agents reusable tasks. Consumed by the
 developer (Leo) via `pi install` or project-local `.pi/` placement.
 
+## Local runtime context
+
+`pi-rtk-optimizer` is installed globally through `~/.pi/agent/settings.json`.
+It rewrites bash commands via `rtk rewrite` and compacts noisy bash/tool output
+(test/build/git/lint/search). Source `read` compaction is disabled, so RTK does
+not compete with `read-outline`; file reads remain exact unless `read-outline`
+itself replaces a large full-file read with an outline.
+
+Use `/rtk stats` to inspect RTK savings.
+
 ## Top-level layout
 
 ```
