@@ -28,20 +28,6 @@ Personal collection of [pi](https://pi.dev) extensions and skills.
 | `/audit-code`    | Perform a scoped code audit with hypotheses/evidence   |
 | `/investigate`   | Run a hypothesis-driven investigation workflow         |
 
-## Utility scripts
-
-Check which configured pi models are actually callable in the current IT/auth
-environment:
-
-```bash
-npm run check:models       # dry run: list exact enabledModels
-npm run check:models:live  # live probe: tiny pi -p call per model
-```
-
-Live mode may incur small provider/Copilot usage. It intentionally uses the real
-`pi` CLI/auth path so it catches provider-side access failures, not just local
-configuration presence.
-
 ## Local runtime optimizers
 
 This environment also uses the external npm package
