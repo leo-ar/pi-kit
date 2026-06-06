@@ -18,6 +18,16 @@ Personal collection of [pi](https://pi.dev) extensions and skills.
 | [analysis-workflow-init](skills/analysis-workflow-init/) | Scaffold a hypothesis-driven investigation workspace       |
 | [dev-workflow-init](skills/dev-workflow-init/)           | Scaffold an LLM-guided development workflow into a project |
 
+## Prompt templates
+
+| Name             | What it does                                           |
+| ---------------- | ------------------------------------------------------ |
+| `/pr-review`     | Review the current branch or PR with structured output |
+| `/pr-create`     | Draft or create a pull request from the current branch |
+| `/copilot-notes` | Triage and respond to GitHub Copilot PR review notes   |
+| `/audit-code`    | Perform a scoped code audit with hypotheses/evidence   |
+| `/investigate`   | Run a hypothesis-driven investigation workflow         |
+
 ## Local runtime optimizers
 
 This environment also uses the external npm package

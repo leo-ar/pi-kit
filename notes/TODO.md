@@ -4,7 +4,7 @@
 
 ## Doing
 
-- [ ] Decide first prompt template to implement from `notes/session-history-prompt-candidates.md` (recommended: `/pr-review`)
+- [ ] Try the new PR/investigation prompt templates in real sessions and refine wording
 
 ## Backlog
 
@@ -14,8 +14,8 @@
 
 ### From PD LLM usage patterns
 
-- [ ] Create `/pr-review` prompt template
-- [ ] Create `/audit-code` prompt template
+- [x] Create `/pr-review` prompt template
+- [x] Create `/audit-code` prompt template
 - [ ] Create `/migration-plan` or `/cleanup-pass` prompt template
 - [ ] Create low-cost prompt templates for common modes (`cheap-coding`, `architecture-pass`, `research-synthesis`)
 - [x] Investigate whether pi extensions can switch model/thinking settings programmatically — yes: `pi.setModel`, `pi.setThinkingLevel`, `ctx.modelRegistry.find`
@@ -25,4 +25,5 @@
 
 ## Done
 
+- [x] Create `/pr-create`, `/copilot-notes`, and `/investigate` prompt templates
 - [x] Explore what we could do based on `~/org/topics/pd-llm-usage-patterns.org` — see `notes/pd-llm-usage-patterns-exploration.md`

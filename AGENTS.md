@@ -25,6 +25,7 @@ Use `/rtk stats` to inspect RTK savings.
 ```
 extensions/          pi extensions — each registers commands or behaviour
 skills/              pi skills — markdown instruction sets
+prompts/             pi prompt templates — reusable slash-command prompts
 notes/               working notes, TODO, retros, analysis docs
 .pi/                 project-local pi config (SYSTEM.md, prompts)
 ```
@@ -43,6 +44,13 @@ A pi extension is a TypeScript package that adds commands or behaviour to pi.
 `AGENTS.md` at the extension root describes the extension's internals — read it
 when modifying that extension. For workflow, testing strategy, and conventions
 see [`extensions/AGENTS.md`](extensions/AGENTS.md).
+
+## Prompt templates (`prompts/*.md`)
+
+Prompt templates are Markdown files invoked as slash commands by filename, e.g.
+`prompts/pr-review.md` becomes `/pr-review`. Use frontmatter for `description`
+and `argument-hint`; keep templates repo-adaptive rather than encoding
+project-specific facts.
 
 ## Skills (`skills/<name>/`)
 

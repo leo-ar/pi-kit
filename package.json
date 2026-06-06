@@ -6,6 +6,11 @@
     "test": "node --test --experimental-strip-types 'extensions/**/*.test.ts'",
     "test:ci": "node --test --experimental-strip-types 'extensions/**/*.test.ts'"
   },
+  "pi": {
+    "prompts": [
+      "prompts/*.md"
+    ]
+  },
   "devDependencies": {
     "fast-check": "^4.0.0"
   }
