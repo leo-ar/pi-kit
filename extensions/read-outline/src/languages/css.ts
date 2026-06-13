@@ -17,20 +17,37 @@ export function generateCssOutline(lines: string[]): OutlineEntry[] {
     if (trimmed.startsWith("* ") && !trimmed.includes("{")) continue;
 
     // At-rules: @media, @keyframes, @layer, @container, @supports, @font-face
-    const atRuleMatch = trimmed.match(/^(@(?:media|keyframes|layer|container|supports|font-face|import|charset))\s*(.*)/);
+    const atRuleMatch = trimmed.match(
+      /^(@(?:media|keyframes|layer|container|supports|font-face|import|charset))\s*(.*)/,
+    );
     if (atRuleMatch) {
       const keyword = atRuleMatch[1];
       const rest = atRuleMatch[2].replace(/\s*\{.*$/, "").trim();
       const name = rest ? `${keyword} ${rest}` : keyword;
 
       // Single-line at-rules without braces (e.g., @import, @charset)
-      if (!lines[i].includes("{") && (keyword === "@import" || keyword === "@charset")) {
-        entries.push({ kind: "at-rule", name, startLine: i + 1, endLine: i + 1, exported: true });
+      if (
+        !lines[i].includes("{") &&
+        (keyword === "@import" || keyword === "@charset")
+      ) {
+        entries.push({
+          kind: "at-rule",
+          name,
+          startLine: i + 1,
+          endLine: i + 1,
+          exported: true,
+        });
         continue;
       }
 
       const endLine = findBlockEnd(lines, i);
-      entries.push({ kind: "at-rule", name, startLine: i + 1, endLine: endLine + 1, exported: true });
+      entries.push({
+        kind: "at-rule",
+        name,
+        startLine: i + 1,
+        endLine: endLine + 1,
+        exported: true,
+      });
       continue;
     }
 
@@ -57,7 +74,13 @@ export function generateCssOutline(lines: string[]): OutlineEntry[] {
           const endLine = findBlockEnd(lines, i);
           // Only record if we found a block (endLine > i means there was a brace pair)
           if (endLine > i) {
-            entries.push({ kind: "rule", name: selectorName, startLine: i + 1, endLine: endLine + 1, exported: true });
+            entries.push({
+              kind: "rule",
+              name: selectorName,
+              startLine: i + 1,
+              endLine: endLine + 1,
+              exported: true,
+            });
             continue;
           }
         }

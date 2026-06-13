@@ -6,14 +6,14 @@ outlines, forcing the agent into an outline→targeted-read pattern.
 ## Why?
 
 Full-file reads are the largest token sink in pi sessions — a 300-line file
-costs ~2000 tokens when the agent usually only needs 1-2 functions. By
-returning an outline instead, the agent learns the structure and re-reads just
-the section it needs with `offset`/`limit`.
+costs ~2000 tokens when the agent usually only needs 1-2 functions. By returning
+an outline instead, the agent learns the structure and re-reads just the section
+it needs with `offset`/`limit`.
 
 ## How it works
 
-Hooks pi's `tool_result` event for the `read` tool. When a full-file read
-(no offset/limit) returns >150 lines of a supported source file, replaces the
+Hooks pi's `tool_result` event for the `read` tool. When a full-file read (no
+offset/limit) returns >150 lines of a supported source file, replaces the
 content with a structural outline.
 
 **Example** — reading a 312-line TypeScript file:

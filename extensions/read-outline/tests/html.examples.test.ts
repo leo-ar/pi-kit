@@ -16,7 +16,7 @@ describe("generateHtmlOutline — examples", () => {
       "</html>",
     ];
     const result = generateHtmlOutline(lines);
-    const names = result.map(e => e.name);
+    const names = result.map((e) => e.name);
     assert.ok(names.includes("html"));
     assert.ok(names.includes("head"));
     assert.ok(names.includes("body"));
@@ -43,7 +43,7 @@ describe("generateHtmlOutline — examples", () => {
       "</body>",
     ];
     const result = generateHtmlOutline(lines);
-    const names = result.map(e => e.name);
+    const names = result.map((e) => e.name);
     assert.ok(names.includes("body"));
     assert.ok(names.includes("header.site-header"));
     assert.ok(names.includes("nav"));
@@ -53,11 +53,7 @@ describe("generateHtmlOutline — examples", () => {
   });
 
   it("extracts id attribute", () => {
-    const lines = [
-      '<div id="app">',
-      "  <p>Content</p>",
-      "</div>",
-    ];
+    const lines = ['<div id="app">', "  <p>Content</p>", "</div>"];
     const result = generateHtmlOutline(lines);
     assert.equal(result.length, 1);
     assert.equal(result[0].name, "div#app");
@@ -87,18 +83,14 @@ describe("generateHtmlOutline — examples", () => {
       "</head>",
     ];
     const result = generateHtmlOutline(lines);
-    const names = result.map(e => e.name);
+    const names = result.map((e) => e.name);
     assert.ok(names.includes("head"));
     assert.ok(names.includes("style"));
     assert.ok(names.includes("script"));
   });
 
   it("handles self-closing tags (not in semantic set though)", () => {
-    const lines = [
-      "<div>",
-      "  <img src='test.png' />",
-      "</div>",
-    ];
+    const lines = ["<div>", "  <img src='test.png' />", "</div>"];
     const result = generateHtmlOutline(lines);
     // img is not semantic — only div is detected
     assert.equal(result.length, 1);
@@ -133,7 +125,7 @@ describe("generateHtmlOutline — examples", () => {
       "</template>",
     ];
     const result = generateHtmlOutline(lines);
-    const tmpl = result.find(e => e.name === "template#card-template");
+    const tmpl = result.find((e) => e.name === "template#card-template");
     assert.ok(tmpl);
     assert.equal(tmpl!.startLine, 1);
     assert.equal(tmpl!.endLine, 5);

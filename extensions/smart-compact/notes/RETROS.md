@@ -2,14 +2,14 @@
 
 ## 2026-05-24 — smart-compact polish (Feature)
 
-**Branch:** `feat/smart-compact-polish`
-**Duration:** Single session (continuation)
+**Branch:** `feat/smart-compact-polish` **Duration:** Single session
+(continuation)
 
 ### What went well
 
 - All three surfaced items resolved in a single commit. The generator-effects
-  architecture made adding `precomputedFileOps` and `isSplitTurn` trivial —
-  just new fields on `PipelineInput` and a few lines of logic in the generator.
+  architecture made adding `precomputedFileOps` and `isSplitTurn` trivial — just
+  new fields on `PipelineInput` and a few lines of logic in the generator.
 - Script-runner tests for the new features were quick to write (copy existing
   pattern, add new assertions). 3 new tests in ~5 minutes.
 - TUI upgrade to `ctx.ui.custom()` with `DynamicBorder` + `Markdown` gives a
@@ -31,16 +31,15 @@
   removes modified from read) — same pattern as the original extraction, so
   existing property tests still cover the logic.
 
-
 ## 2026-05-24 — smart-compact refactor (Feature)
 
-**Branch:** `smart-compact`
-**Duration:** Single session
+**Branch:** `smart-compact` **Duration:** Single session
 
 ### What went well
 
-- Generator-effects pattern worked exactly as designed — pipeline is fully testable
-  without mocking pi internals. Script-runner tests step through cleanly.
+- Generator-effects pattern worked exactly as designed — pipeline is fully
+  testable without mocking pi internals. Script-runner tests step through
+  cleanly.
 - Property tests (fast-check) caught two real bugs during development:
   1. `patchSummary` idempotence failure — appending errors without checking if
      already present.
@@ -59,7 +58,8 @@
 - Did not integrate with pi's existing `preparation.fileOps` — would avoid
   re-extracting file operations but requires importing pi's `FileOperations`
   type and adapting the pipeline input.
-- `compact-stats` command is still using `ui.notify` which truncates long output.
+- `compact-stats` command is still using `ui.notify` which truncates long
+  output.
 
 ### Lessons / patterns to carry forward
 

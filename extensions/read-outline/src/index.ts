@@ -34,7 +34,9 @@ export default function readOutlineExtension(pi: ExtensionAPI) {
     return `${Math.floor(bytes / (1024 * 1024))}MB`;
   }
 
-  function updateStatus(ctx: { ui: { setStatus(key: string, text: string): void } }) {
+  function updateStatus(ctx: {
+    ui: { setStatus(key: string, text: string): void };
+  }) {
     ctx.ui.setStatus("read-outline", `📐 ${formatBytes(savedBytes)}`);
   }
 

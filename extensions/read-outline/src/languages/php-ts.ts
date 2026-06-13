@@ -17,7 +17,9 @@ import type { OutlineEntry } from "../types.ts";
 import { parseSource } from "../tree-sitter/init.ts";
 import { generatePhpOutlineRegex } from "./php-regex.ts";
 
-export async function generatePhpOutlineTS(lines: string[]): Promise<OutlineEntry[]> {
+export async function generatePhpOutlineTS(
+  lines: string[],
+): Promise<OutlineEntry[]> {
   const source = lines.join("\n");
   const root = await parseSource("php", source);
 
@@ -136,7 +138,11 @@ function walkNode(node: any, entries: OutlineEntry[]): void {
               if (firstArg) {
                 // The argument contains a string or encapsed_string
                 const strNode = firstArg.child(0);
-                if (strNode && (strNode.type === "string" || strNode.type === "encapsed_string")) {
+                if (
+                  strNode &&
+                  (strNode.type === "string" ||
+                    strNode.type === "encapsed_string")
+                ) {
                   const constName = strNode.text.replace(/^['"]|['"]$/g, "");
                   entries.push({
                     kind: "const",
@@ -155,7 +161,11 @@ function walkNode(node: any, entries: OutlineEntry[]): void {
 
       default:
         // Recurse into program/compound nodes
-        if (child.type === "program" || child.type === "php_tag" || child.type === "text") {
+        if (
+          child.type === "program" ||
+          child.type === "php_tag" ||
+          child.type === "text"
+        ) {
           walkNode(child, entries);
         }
         break;

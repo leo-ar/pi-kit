@@ -7,15 +7,20 @@ Audit this code for: `$1`. Constraints/focus: `${@:2}`.
 
 Repository-adaptive setup:
 
-- Load local guidance if present: `AGENTS.md`, `.pi/SYSTEM.md`, `README.md`, `CONTRIBUTING.md`, architecture docs, package/test config.
+- Load local guidance if present: `AGENTS.md`, `.pi/SYSTEM.md`, `README.md`,
+  `CONTRIBUTING.md`, architecture docs, package/test config.
 - Follow local conventions and threat models over generic assumptions.
 
 Scope discipline:
 
-- Keep the audit focused on `$1`; do not turn it into a whole-repo review unless evidence requires it.
-- Start with aggregate discovery (`rg`, `git grep`, route/file lists, dependency/config inspection) before targeted reads.
-- Maintain a clear distinction between verified facts, hypotheses, and unsupported assumptions.
-- For proprietary/private data, use aggregate metrics only unless I explicitly approve details.
+- Keep the audit focused on `$1`; do not turn it into a whole-repo review unless
+  evidence requires it.
+- Start with aggregate discovery (`rg`, `git grep`, route/file lists,
+  dependency/config inspection) before targeted reads.
+- Maintain a clear distinction between verified facts, hypotheses, and
+  unsupported assumptions.
+- For proprietary/private data, use aggregate metrics only unless I explicitly
+  approve details.
 
 Audit workflow:
 
@@ -67,4 +72,5 @@ Output format:
 ## Recommended next actions
 ```
 
-If no issues are found, state what was checked, why confidence is limited or high, and what would increase confidence.
+If no issues are found, state what was checked, why confidence is limited or
+high, and what would increase confidence.

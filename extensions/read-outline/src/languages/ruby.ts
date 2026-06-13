@@ -13,14 +13,26 @@ export function generateRubyOutline(lines: string[]): OutlineEntry[] {
     const classMatch = trimmed.match(/^(class|module)\s+(\w+)/);
     if (classMatch) {
       const endLine = findRubyBlockEnd(lines, i);
-      entries.push({ kind: classMatch[1], name: classMatch[2], startLine: i + 1, endLine: endLine + 1, exported: true });
+      entries.push({
+        kind: classMatch[1],
+        name: classMatch[2],
+        startLine: i + 1,
+        endLine: endLine + 1,
+        exported: true,
+      });
       continue;
     }
 
     const fnMatch = trimmed.match(/^def\s+(self\.)?(\w+[?!]?)/);
     if (fnMatch) {
       const endLine = findRubyBlockEnd(lines, i);
-      entries.push({ kind: "fn", name: fnMatch[2], startLine: i + 1, endLine: endLine + 1, exported: true });
+      entries.push({
+        kind: "fn",
+        name: fnMatch[2],
+        startLine: i + 1,
+        endLine: endLine + 1,
+        exported: true,
+      });
     }
   }
 

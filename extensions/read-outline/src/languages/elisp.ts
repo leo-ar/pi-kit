@@ -12,14 +12,22 @@ import type { OutlineEntry } from "../types.ts";
 import { parseSource } from "../tree-sitter/init.ts";
 
 const DEFVAR_KEYWORDS = new Set([
-  "defvar", "defcustom", "defconst", "defgroup", "defface",
+  "defvar",
+  "defcustom",
+  "defconst",
+  "defgroup",
+  "defface",
 ]);
 
 const MODE_KEYWORDS = new Set([
-  "define-minor-mode", "define-derived-mode", "define-globalized-minor-mode",
+  "define-minor-mode",
+  "define-derived-mode",
+  "define-globalized-minor-mode",
 ]);
 
-export async function generateElispOutline(lines: string[]): Promise<OutlineEntry[]> {
+export async function generateElispOutline(
+  lines: string[],
+): Promise<OutlineEntry[]> {
   const source = lines.join("\n");
   const root = await parseSource("elisp", source);
 

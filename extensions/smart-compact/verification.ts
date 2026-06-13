@@ -83,7 +83,10 @@ export function verify(summary: string, extraction: Extraction): string[] {
     const filename = f.split("/").pop() ?? f;
     // Skip check if basename is empty (malformed path like "dir/")
     if (!filename) continue;
-    if (!lower.includes(filename.toLowerCase()) && !lower.includes(f.toLowerCase())) {
+    if (
+      !lower.includes(filename.toLowerCase()) &&
+      !lower.includes(f.toLowerCase())
+    ) {
       gaps.push(`Missing modified file: ${f}`);
     }
   }

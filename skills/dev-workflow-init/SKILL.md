@@ -1,11 +1,16 @@
 ---
 name: dev-workflow-init
-description: Scaffold the llm-workflow system into the current project. Creates CLAUDE.md, notes/TODO.md, notes/RETROS.md, and .pi/prompts/ templates. Auto-discovers project context from package.json, composer.json, README, and directory structure to fill in template slots.
+description:
+  Scaffold the llm-workflow system into the current project. Creates CLAUDE.md,
+  notes/TODO.md, notes/RETROS.md, and .pi/prompts/ templates. Auto-discovers
+  project context from package.json, composer.json, README, and directory
+  structure to fill in template slots.
 ---
 
 # Workflow Init
 
-Scaffold the llm-workflow structured development system into the current project.
+Scaffold the llm-workflow structured development system into the current
+project.
 
 ## What Gets Created
 
@@ -62,12 +67,13 @@ find . -maxdepth 2 -type d \
 
 If any of these cannot be inferred, ask the user:
 
-1. **Project description** — "One-sentence description of what this project does?"
+1. **Project description** — "One-sentence description of what this project
+   does?"
 2. **Primary language** — "Primary language? (e.g., TypeScript, PHP, Python)"
 3. **Test runner** — "How do you run tests? (e.g., `npm test`, `phpunit`)"
 
-Do NOT ask about things you successfully discovered.
-Do NOT ask about formatter if none is detected (just omit it from Conventions).
+Do NOT ask about things you successfully discovered. Do NOT ask about formatter
+if none is detected (just omit it from Conventions).
 
 ### Phase 3: Handle Existing Files
 
@@ -76,7 +82,8 @@ Before writing any file, check if it already exists:
 - **If `CLAUDE.md` exists:** Ask the user:
   - "Keep existing" — skip writing CLAUDE.md entirely
   - "Overwrite" — replace with the new template
-  - "Create copy" — write to `CLAUDE.new.1.md` (if that exists, increment: `CLAUDE.new.2.md`, etc.)
+  - "Create copy" — write to `CLAUDE.new.1.md` (if that exists, increment:
+    `CLAUDE.new.2.md`, etc.)
 
 - **If `notes/TODO.md` or `notes/RETROS.md` exist:** Same three options, but ask
   once for all notes files together.
@@ -86,18 +93,20 @@ Before writing any file, check if it already exists:
 
 ### Phase 4: Scaffold Files
 
-Use the templates from [templates/](templates/) as the base.
-Fill in the `<fill:>` placeholders:
+Use the templates from [templates/](templates/) as the base. Fill in the
+`<fill:>` placeholders:
 
 **In `CLAUDE.md`:**
 
-Replace `<fill: one paragraph — what this repo does, who consumes it>` with
-the discovered/provided project description.
+Replace `<fill: one paragraph — what this repo does, who consumes it>` with the
+discovered/provided project description.
 
 Replace the repository layout code block with the auto-discovered directory
 structure (one line per directory, no file listings).
 
-Replace `<fill: language details (TS vs PHP), module system, formatter, test runner commands (npm test, phpunit)>` with a filled Conventions section like:
+Replace
+`<fill: language details (TS vs PHP), module system, formatter, test runner commands (npm test, phpunit)>`
+with a filled Conventions section like:
 
 ```markdown
 - **Language:** TypeScript (ESM)
@@ -106,8 +115,8 @@ Replace `<fill: language details (TS vs PHP), module system, formatter, test run
 - **Linter:** `eslint .`
 ```
 
-Adapt based on what was discovered.
-Only include lines for tools that actually exist in the project.
+Adapt based on what was discovered. Only include lines for tools that actually
+exist in the project.
 
 **In `.pi/prompts/feature.md`:** No modifications needed — keep as-is.
 

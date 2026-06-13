@@ -9,34 +9,54 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import fc from "fast-check";
-import { verify, patchSummary, isTransientError, criticalErrors } from "./verification.ts";
+import {
+  verify,
+  patchSummary,
+  isTransientError,
+  criticalErrors,
+} from "./verification.ts";
 import type { Extraction, FileOps } from "./extraction.ts";
 
 // ─── Arbitraries ─────────────────────────────────────────────────────────────
 
-const arbFilePath = fc.stringMatching(/^[a-z][a-z0-9_-]*(?:\/[a-z][a-z0-9._-]*)+$/);
+const arbFilePath = fc.stringMatching(
+  /^[a-z][a-z0-9_-]*(?:\/[a-z][a-z0-9._-]*)+$/,
+);
 
 const arbExtraction = fc
   .record({
     goal: fc.string({ maxLength: 100 }),
     readFiles: fc.array(arbFilePath, { maxLength: 5 }),
     modifiedFiles: fc.array(arbFilePath, { minLength: 0, maxLength: 5 }),
-    errors: fc.array(fc.string({ minLength: 6, maxLength: 100 }), { maxLength: 5 }),
+    errors: fc.array(fc.string({ minLength: 6, maxLength: 100 }), {
+      maxLength: 5,
+    }),
     decisions: fc.array(fc.string({ maxLength: 100 }), { maxLength: 5 }),
     constraints: fc.array(fc.string({ maxLength: 100 }), { maxLength: 5 }),
   })
-  .map(({ goal, readFiles, modifiedFiles, errors, decisions, constraints }): Extraction => {
-    const modified = new Set(modifiedFiles);
-    // Ensure disjointness: remove modified files from read set
-    const read = new Set(readFiles.filter((f) => !modified.has(f)));
-    const files: FileOps = { read, modified };
-    return { goal, files, errors, decisions, constraints };
-  });
+  .map(
+    ({
+      goal,
+      readFiles,
+      modifiedFiles,
+      errors,
+      decisions,
+      constraints,
+    }): Extraction => {
+      const modified = new Set(modifiedFiles);
+      // Ensure disjointness: remove modified files from read set
+      const read = new Set(readFiles.filter((f) => !modified.has(f)));
+      const files: FileOps = { read, modified };
+      return { goal, files, errors, decisions, constraints };
+    },
+  );
 
 const arbGaps = fc.array(
   fc.oneof(
     arbFilePath.map((f) => `Missing modified file: ${f}`),
-    fc.string({ minLength: 10, maxLength: 80 }).map((e) => `Missing error: ${e}`),
+    fc
+      .string({ minLength: 10, maxLength: 80 })
+      .map((e) => `Missing error: ${e}`),
   ),
   { maxLength: 5 },
 );
@@ -46,20 +66,31 @@ const arbGaps = fc.array(
 describe("verify — properties", () => {
   it("for all summaries containing every modified filename, verify returns empty gaps", () => {
     fc.assert(
-      fc.property(arbExtraction, fc.string({ maxLength: 200 }), (extraction, baseSummary) => {
-        // Build a summary guaranteed to contain all modified filenames and critical error snippets
-        const filenames = [...extraction.files.modified].map((f) => f.split("/").pop()!);
-        const critical = criticalErrors(extraction.errors);
-        const errorSnippets = critical.slice(-3).map((e) => e.slice(0, 30));
-        const summary = baseSummary + " " + filenames.join(" ") + " " + errorSnippets.join(" ");
+      fc.property(
+        arbExtraction,
+        fc.string({ maxLength: 200 }),
+        (extraction, baseSummary) => {
+          // Build a summary guaranteed to contain all modified filenames and critical error snippets
+          const filenames = [...extraction.files.modified].map(
+            (f) => f.split("/").pop()!,
+          );
+          const critical = criticalErrors(extraction.errors);
+          const errorSnippets = critical.slice(-3).map((e) => e.slice(0, 30));
+          const summary =
+            baseSummary +
+            " " +
+            filenames.join(" ") +
+            " " +
+            errorSnippets.join(" ");
 
-        const gaps = verify(summary, extraction);
-        assert.strictEqual(
-          gaps.length,
-          0,
-          `Expected no gaps but got: ${JSON.stringify(gaps)}`,
-        );
-      }),
+          const gaps = verify(summary, extraction);
+          assert.strictEqual(
+            gaps.length,
+            0,
+            `Expected no gaps but got: ${JSON.stringify(gaps)}`,
+          );
+        },
+      ),
       { numRuns: 20 },
     );
   });
@@ -70,7 +101,10 @@ describe("verify — properties", () => {
         arbExtraction.filter((e) => e.files.modified.size > 0),
         (extraction) => {
           const gaps = verify("", extraction);
-          assert(gaps.length > 0, "Expected gaps for empty summary with modified files");
+          assert(
+            gaps.length > 0,
+            "Expected gaps for empty summary with modified files",
+          );
         },
       ),
       { numRuns: 20 },
@@ -144,13 +178,17 @@ describe("verify — examples", () => {
 
 describe("patchSummary — examples", () => {
   it("appends unresolved errors section", () => {
-    const result = patchSummary("## Summary", ["Missing error: TypeError: foo is undefined"]);
+    const result = patchSummary("## Summary", [
+      "Missing error: TypeError: foo is undefined",
+    ]);
     assert(result.includes("## Unresolved Errors"));
     assert(result.includes("TypeError: foo is undefined"));
   });
 
   it("does not append modified-files (handled by caller)", () => {
-    const result = patchSummary("## Summary", ["Missing modified file: src/app.ts"]);
+    const result = patchSummary("## Summary", [
+      "Missing modified file: src/app.ts",
+    ]);
     // File gaps are intentionally NOT patched — the caller appends file tags unconditionally
     assert(!result.includes("<modified-files>"));
   });
@@ -160,19 +198,33 @@ describe("patchSummary — examples", () => {
 
 describe("isTransientError", () => {
   it("classifies edit-not-found as transient", () => {
-    assert(isTransientError("Could not find the exact text in src/app.ts. The old text must match exactly."));
+    assert(
+      isTransientError(
+        "Could not find the exact text in src/app.ts. The old text must match exactly.",
+      ),
+    );
   });
 
   it("classifies ENOENT as transient", () => {
-    assert(isTransientError("ENOENT: no such file or directory, access '/tmp/foo'"));
+    assert(
+      isTransientError("ENOENT: no such file or directory, access '/tmp/foo'"),
+    );
   });
 
   it("classifies validation errors as transient", () => {
-    assert(isTransientError("Validation failed for tool \"edit\": missing required field"));
+    assert(
+      isTransientError(
+        'Validation failed for tool "edit": missing required field',
+      ),
+    );
   });
 
   it("classifies no-op edits as transient", () => {
-    assert(isTransientError("No changes made to README.md. The replacement produced identical output."));
+    assert(
+      isTransientError(
+        "No changes made to README.md. The replacement produced identical output.",
+      ),
+    );
   });
 
   it("classifies (no output) as transient", () => {
@@ -180,7 +232,9 @@ describe("isTransientError", () => {
   });
 
   it("does NOT classify TypeError as transient", () => {
-    assert(!isTransientError("TypeError: cannot read property 'foo' of undefined"));
+    assert(
+      !isTransientError("TypeError: cannot read property 'foo' of undefined"),
+    );
   });
 
   it("does NOT classify timeout as transient", () => {
@@ -192,7 +246,11 @@ describe("isTransientError", () => {
   });
 
   it("classifies bash syntax errors as transient (agent retries)", () => {
-    assert(isTransientError("/bin/bash: -c: line 7: syntax error near unexpected token"));
+    assert(
+      isTransientError(
+        "/bin/bash: -c: line 7: syntax error near unexpected token",
+      ),
+    );
   });
 });
 

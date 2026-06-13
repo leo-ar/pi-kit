@@ -14,7 +14,7 @@ const phpLineArb = fc.array(
     fc.constant("namespace App\\Models;"),
     fc.constant("class User {"),
     fc.constant("    public function getName(): string {"),
-    fc.constant('        return $this->name;'),
+    fc.constant("        return $this->name;"),
     fc.constant("    }"),
     fc.constant("}"),
     fc.constant("interface Cacheable {"),
@@ -112,8 +112,14 @@ describe("generateOutline — property: valid line ranges (new languages)", () =
           const entries = await generateOutline(lines, path);
           for (const entry of entries) {
             assert.ok(entry.startLine >= 1, `startLine ${entry.startLine} < 1`);
-            assert.ok(entry.endLine >= entry.startLine, `endLine ${entry.endLine} < startLine ${entry.startLine}`);
-            assert.ok(entry.endLine <= lines.length, `endLine ${entry.endLine} > totalLines ${lines.length}`);
+            assert.ok(
+              entry.endLine >= entry.startLine,
+              `endLine ${entry.endLine} < startLine ${entry.startLine}`,
+            );
+            assert.ok(
+              entry.endLine <= lines.length,
+              `endLine ${entry.endLine} > totalLines ${lines.length}`,
+            );
           }
         }),
         { numRuns: 200 },
@@ -159,7 +165,11 @@ describe("generateOutline — property: names are non-empty (new languages)", ()
         for (const entry of entries) {
           assert.ok(entry.name.length > 0, "name is empty");
           // PHP names can contain backslashes (namespaces)
-          assert.match(entry.name, /^\w[\w\\]*$/, `name "${entry.name}" is not valid`);
+          assert.match(
+            entry.name,
+            /^\w[\w\\]*$/,
+            `name "${entry.name}" is not valid`,
+          );
         }
       }),
       { numRuns: 200 },
@@ -172,7 +182,10 @@ describe("generateOutline — property: names are non-empty (new languages)", ()
         const entries = await generateOutline(lines, "file.css");
         for (const entry of entries) {
           assert.ok(entry.name.length > 0, "name is empty");
-          assert.ok(!entry.name.includes("{"), `name "${entry.name}" contains stray brace`);
+          assert.ok(
+            !entry.name.includes("{"),
+            `name "${entry.name}" contains stray brace`,
+          );
         }
       }),
       { numRuns: 200 },
@@ -186,7 +199,11 @@ describe("generateOutline — property: names are non-empty (new languages)", ()
         for (const entry of entries) {
           assert.ok(entry.name.length > 0, "name is empty");
           // HTML names: tag or tag#id or tag.class
-          assert.match(entry.name, /^[\w]+([.#][\w-]+)?$/, `name "${entry.name}" is not well-formed`);
+          assert.match(
+            entry.name,
+            /^[\w]+([.#][\w-]+)?$/,
+            `name "${entry.name}" is not well-formed`,
+          );
         }
       }),
       { numRuns: 200 },
@@ -229,12 +246,18 @@ describe("generateCssOutline — property: rules span brace pairs", () => {
       fc.asyncProperty(cssLineArb, async (lines) => {
         const entries = generateCssOutline(lines);
         for (const entry of entries) {
-          if (entry.kind === "rule" || (entry.kind === "at-rule" && entry.endLine > entry.startLine)) {
+          if (
+            entry.kind === "rule" ||
+            (entry.kind === "at-rule" && entry.endLine > entry.startLine)
+          ) {
             // Multi-line entries must span open-to-close brace
             const startContent = lines[entry.startLine - 1] ?? "";
             const blockSlice = lines.slice(entry.startLine - 1, entry.endLine);
-            const hasBrace = blockSlice.some(l => l.includes("{"));
-            assert.ok(hasBrace, `entry "${entry.name}" [${entry.startLine}:${entry.endLine}] has no brace`);
+            const hasBrace = blockSlice.some((l) => l.includes("{"));
+            assert.ok(
+              hasBrace,
+              `entry "${entry.name}" [${entry.startLine}:${entry.endLine}] has no brace`,
+            );
           }
         }
       }),
@@ -247,36 +270,30 @@ describe("generateCssOutline — property: rules span brace pairs", () => {
 
 describe("generatePhpOutline — property: correct spans on valid PHP", () => {
   // Generate structurally valid PHP: complete functions and classes with balanced braces
-  const validPhpArb = fc.tuple(
-    fc.array(
-      fc.oneof(
-        fc.constant([
-          "function helper(): int {",
-          "    return 42;",
-          "}",
-        ]),
-        fc.constant([
-          "class User {",
-          "    public function name(): string {",
-          "        return 'test';",
-          "    }",
-          "}",
-        ]),
-        fc.constant([
-          "interface Cacheable {",
-          "    public function key(): string;",
-          "}",
-        ]),
-        fc.constant([
-          "enum Status {",
-          "    case Active;",
-          "}",
-        ]),
-        fc.constant(["", "// comment"]),
+  const validPhpArb = fc
+    .tuple(
+      fc.array(
+        fc.oneof(
+          fc.constant(["function helper(): int {", "    return 42;", "}"]),
+          fc.constant([
+            "class User {",
+            "    public function name(): string {",
+            "        return 'test';",
+            "    }",
+            "}",
+          ]),
+          fc.constant([
+            "interface Cacheable {",
+            "    public function key(): string;",
+            "}",
+          ]),
+          fc.constant(["enum Status {", "    case Active;", "}"]),
+          fc.constant(["", "// comment"]),
+        ),
+        { minLength: 1, maxLength: 8 },
       ),
-      { minLength: 1, maxLength: 8 },
-    ),
-  ).map(([blocks]) => ["<?php", "", ...blocks.flat()]);
+    )
+    .map(([blocks]) => ["<?php", "", ...blocks.flat()]);
 
   it("every entry span is balanced (startLine to endLine has matching braces)", async () => {
     await fc.assert(
@@ -292,7 +309,11 @@ describe("generatePhpOutline — property: correct spans on valid PHP", () => {
           }
           // Entries that contain braces should be balanced
           if (text.includes("{")) {
-            assert.strictEqual(depth, 0, `unbalanced braces in ${entry.name} [${entry.startLine}-${entry.endLine}]: depth=${depth}`);
+            assert.strictEqual(
+              depth,
+              0,
+              `unbalanced braces in ${entry.name} [${entry.startLine}-${entry.endLine}]: depth=${depth}`,
+            );
           }
         }
       }),
@@ -306,7 +327,9 @@ describe("generatePhpOutline — property: correct spans on valid PHP", () => {
         const entries = await generatePhpOutline(lines);
         // Count declaration keywords in source
         const source = lines.join("\n");
-        const declCount = (source.match(/^(function|class|interface|enum)\s+\w+/gm) ?? []).length;
+        const declCount = (
+          source.match(/^(function|class|interface|enum)\s+\w+/gm) ?? []
+        ).length;
         // Tree-sitter should find at least as many as top-level keywords
         // (it finds more due to methods inside classes)
         assert.ok(entries.length >= 0, "should not crash");

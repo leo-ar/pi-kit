@@ -24,21 +24,21 @@ Token usage and metadata go in `:PROPERTIES:` drawers.
 
 ## What gets exported
 
-| Content | Org rendering |
-|---------|---------------|
-| User turns | `* You [timestamp]` heading |
-| Assistant turns | `* Assistant [timestamp]` with model/provider properties |
-| Bash calls | `#+begin_src bash` + `#+begin_example` output |
-| File reads/writes | `#+begin_src <lang>` (language inferred from extension) |
-| Diffs | `#+begin_src diff` |
-| Token totals | File-level `:PROPERTIES:` drawer |
+| Content           | Org rendering                                            |
+| ----------------- | -------------------------------------------------------- |
+| User turns        | `* You [timestamp]` heading                              |
+| Assistant turns   | `* Assistant [timestamp]` with model/provider properties |
+| Bash calls        | `#+begin_src bash` + `#+begin_example` output            |
+| File reads/writes | `#+begin_src <lang>` (language inferred from extension)  |
+| Diffs             | `#+begin_src diff`                                       |
+| Token totals      | File-level `:PROPERTIES:` drawer                         |
 
 ## Commands
 
-| Command | Effect |
-|---------|--------|
-| `/export-org` | Export to `<session-id>.org` in cwd |
-| `/export-org path.org` | Export to specified path |
+| Command                | Effect                              |
+| ---------------------- | ----------------------------------- |
+| `/export-org`          | Export to `<session-id>.org` in cwd |
+| `/export-org path.org` | Export to specified path            |
 
 ## Install
 
@@ -47,6 +47,7 @@ pi install git:github.com/leo-ar/pi-kit extensions/export-org
 ```
 
 Or symlink for development:
+
 ```bash
 ln -s /path/to/pi-kit/extensions/export-org ~/.pi/agent/extensions/export-org
 ```

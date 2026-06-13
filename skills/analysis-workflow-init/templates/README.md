@@ -1,13 +1,12 @@
 # README
 
-> Written last. References only facts from `verified-facts.md`.
-> Replace this stub when the investigation is complete.
+> Written last. References only facts from `verified-facts.md`. Replace this
+> stub when the investigation is complete.
 
 ## Investigation: <fill: topic>
 
-**Data source:** <fill: what system/table/file was queried>
-**Period covered:** <fill: date range>
-**Completed:** <fill: YYYY-MM-DD>
+**Data source:** <fill: what system/table/file was queried> **Period covered:**
+<fill: date range> **Completed:** <fill: YYYY-MM-DD>
 
 ---
 

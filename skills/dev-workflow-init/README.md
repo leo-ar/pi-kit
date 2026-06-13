@@ -1,7 +1,7 @@
 # LLM-Guided Development Workflow
 
-A template system for structured LLM-assisted development.
-Extracted from real usage on (May 2026).
+A template system for structured LLM-assisted development. Extracted from real
+usage on (May 2026).
 
 ## What's in this repo
 
@@ -25,7 +25,10 @@ Extracted from real usage on (May 2026).
 ## Key principles
 
 - **Git is the history** — no Done sections, no changelogs in TODO
-- **Modes select structure** — feature branches get full ceremony, exploration gets none
-- **Property tests constrain the LLM** — they're executable specifications, not just regression tests
+- **Modes select structure** — feature branches get full ceremony, exploration
+  gets none
+- **Property tests constrain the LLM** — they're executable specifications, not
+  just regression tests
 - **Retros find patterns** — patterns become workflow rules in CLAUDE.md
-- **TODO.md steers the session** — the LLM reads it to know what's in progress and what's next
+- **TODO.md steers the session** — the LLM reads it to know what's in progress
+  and what's next

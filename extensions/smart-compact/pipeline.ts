@@ -100,17 +100,29 @@ export function* compactPipeline(
   // Get model
   const model: unknown = yield { tag: "get_model" };
   if (!model) {
-    yield { tag: "notify", message: "smart-compact: no model available, using default compaction", level: "warning" };
+    yield {
+      tag: "notify",
+      message: "smart-compact: no model available, using default compaction",
+      level: "warning",
+    };
     return undefined;
   }
 
   // Get auth
-  const auth: { ok: boolean; apiKey?: string; headers?: Record<string, string> } = yield {
+  const auth: {
+    ok: boolean;
+    apiKey?: string;
+    headers?: Record<string, string>;
+  } = yield {
     tag: "get_auth",
     model,
   };
   if (!auth.ok || !auth.apiKey) {
-    yield { tag: "notify", message: "smart-compact: auth failed, using default compaction", level: "warning" };
+    yield {
+      tag: "notify",
+      message: "smart-compact: auth failed, using default compaction",
+      level: "warning",
+    };
     return undefined;
   }
 
@@ -123,7 +135,11 @@ export function* compactPipeline(
   }
 
   // Phase 2: LLM synthesis
-  const prompt = buildSynthesisPrompt(conversationText, extraction, previousSummary);
+  const prompt = buildSynthesisPrompt(
+    conversationText,
+    extraction,
+    previousSummary,
+  );
 
   yield {
     tag: "notify",
@@ -140,7 +156,11 @@ export function* compactPipeline(
   };
 
   if (!llmResponse || !llmResponse.trim()) {
-    yield { tag: "notify", message: "smart-compact: empty summary, falling back to default", level: "warning" };
+    yield {
+      tag: "notify",
+      message: "smart-compact: empty summary, falling back to default",
+      level: "warning",
+    };
     return undefined;
   }
 
@@ -159,10 +179,14 @@ export function* compactPipeline(
       turnContext.push(`Current turn goal: ${turnExtraction.goal}`);
     }
     if (turnExtraction.files.modified.size > 0) {
-      turnContext.push(`Turn modified: ${[...turnExtraction.files.modified].join(", ")}`);
+      turnContext.push(
+        `Turn modified: ${[...turnExtraction.files.modified].join(", ")}`,
+      );
     }
     if (turnExtraction.errors.length > 0) {
-      turnContext.push(`Turn errors: ${turnExtraction.errors[turnExtraction.errors.length - 1]}`);
+      turnContext.push(
+        `Turn errors: ${turnExtraction.errors[turnExtraction.errors.length - 1]}`,
+      );
     }
     if (turnContext.length > 0) {
       summary += `\n\n## In-Progress Turn\n${turnContext.map((l) => `- ${l}`).join("\n")}`;

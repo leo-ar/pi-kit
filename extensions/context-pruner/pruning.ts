@@ -57,7 +57,11 @@ export interface ToolResultMessage {
 
 export interface AssistantMessage {
   role: "assistant";
-  content: (TextContent | ToolCallBlock | { type: string; [key: string]: unknown })[];
+  content: (
+    | TextContent
+    | ToolCallBlock
+    | { type: string; [key: string]: unknown }
+  )[];
   [key: string]: unknown;
 }
 
@@ -68,7 +72,11 @@ export interface UserMessage {
   [key: string]: unknown;
 }
 
-export type AnyMessage = ToolResultMessage | AssistantMessage | UserMessage | { role: string; [key: string]: unknown };
+export type AnyMessage =
+  | ToolResultMessage
+  | AssistantMessage
+  | UserMessage
+  | { role: string; [key: string]: unknown };
 
 // ─── Classification ──────────────────────────────────────────────────────────
 
@@ -77,7 +85,8 @@ export type PruneDecision =
   | { action: "stub"; reason: string; stub: string };
 
 /** Informational bash commands — ephemeral, always safe to stub when old. */
-const INFORMATIONAL_BASH = /^\s*(ls|find|tree|dir|cat|head|tail|less|more|wc|file)\b/;
+const INFORMATIONAL_BASH =
+  /^\s*(ls|find|tree|dir|cat|head|tail|less|more|wc|file)\b/;
 
 /** Search commands — re-runnable, safe to stub. */
 const SEARCH_BASH = /^\s*(grep|rg|ag|ripgrep|ack)\b/;
@@ -144,8 +153,12 @@ export function classify(
     }
 
     // Large other bash
-    if (config.pruneBashLarge && contentLength > config.pruneBashLargeThreshold) {
-      const shortCmd = command.length > 60 ? command.slice(0, 57) + "..." : command;
+    if (
+      config.pruneBashLarge &&
+      contentLength > config.pruneBashLargeThreshold
+    ) {
+      const shortCmd =
+        command.length > 60 ? command.slice(0, 57) + "..." : command;
       const kb = (contentLength / 1024).toFixed(1);
       return {
         action: "stub",
@@ -176,7 +189,10 @@ export interface PruneResult {
  * Apply pruning to a message array. Returns a new array with stubs replacing
  * stale tool results. Messages before `recentCutoffIndex` are candidates.
  */
-export function prune(messages: AnyMessage[], config: PrunerConfig = DEFAULT_CONFIG): PruneResult {
+export function prune(
+  messages: AnyMessage[],
+  config: PrunerConfig = DEFAULT_CONFIG,
+): PruneResult {
   const recentCutoff = findRecentCutoff(messages, config.recentTurnsToKeep);
   const toolCallMap = buildToolCallMap(messages);
   const writtenFiles = buildWrittenFilesSet(messages);
@@ -217,7 +233,8 @@ export function prune(messages: AnyMessage[], config: PrunerConfig = DEFAULT_CON
     };
     stats.pruned++;
     stats.charsSaved += originalLength - decision.stub.length;
-    stats.byReason[decision.reason] = (stats.byReason[decision.reason] || 0) + 1;
+    stats.byReason[decision.reason] =
+      (stats.byReason[decision.reason] || 0) + 1;
 
     return stubbed;
   });
@@ -244,7 +261,10 @@ function countLines(msg: ToolResultMessage): number {
  * Find the message index where "recent" starts.
  * Counts backwards from the end, finding the Nth user message boundary.
  */
-export function findRecentCutoff(messages: AnyMessage[], recentTurns: number): number {
+export function findRecentCutoff(
+  messages: AnyMessage[],
+  recentTurns: number,
+): number {
   let userCount = 0;
   for (let i = messages.length - 1; i >= 0; i--) {
     if (messages[i].role === "user") {
@@ -256,7 +276,9 @@ export function findRecentCutoff(messages: AnyMessage[], recentTurns: number): n
 }
 
 /** Build a map from toolCallId to the tool call arguments. */
-export function buildToolCallMap(messages: AnyMessage[]): Map<string, Record<string, unknown>> {
+export function buildToolCallMap(
+  messages: AnyMessage[],
+): Map<string, Record<string, unknown>> {
   const map = new Map<string, Record<string, unknown>>();
   for (const msg of messages) {
     if (msg.role !== "assistant") continue;
@@ -292,7 +314,11 @@ export function buildWrittenFilesSet(messages: AnyMessage[]): Set<string> {
 }
 
 /** Build a short stub for informational bash commands. */
-function buildBashStub(command: string, firstWord: string, msg: ToolResultMessage): string {
+function buildBashStub(
+  command: string,
+  firstWord: string,
+  msg: ToolResultMessage,
+): string {
   const lines = countLines(msg);
 
   if (/^(cat|head|tail)/.test(firstWord)) {

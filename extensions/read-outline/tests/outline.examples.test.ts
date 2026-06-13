@@ -56,9 +56,7 @@ describe("generateOutline — TypeScript", () => {
   });
 
   it("detects const declarations", async () => {
-    const lines = [
-      "export const THRESHOLD = 100;",
-    ];
+    const lines = ["export const THRESHOLD = 100;"];
     const entries = await generateOutline(lines, "file.ts");
     assert.equal(entries.length, 1);
     assert.equal(entries[0].kind, "const");
@@ -124,10 +122,7 @@ describe("generateOutline — Python", () => {
   });
 
   it("detects UPPER_CASE constants", async () => {
-    const lines = [
-      "MAX_RETRIES = 5",
-      "DEFAULT_TIMEOUT = 30",
-    ];
+    const lines = ["MAX_RETRIES = 5", "DEFAULT_TIMEOUT = 30"];
     const entries = await generateOutline(lines, "file.py");
     assert.equal(entries.length, 2);
     assert.equal(entries[0].kind, "const");
@@ -196,11 +191,7 @@ describe("generateOutline — Go", () => {
   });
 
   it("detects type struct", async () => {
-    const lines = [
-      "type Config struct {",
-      "    Name string",
-      "}",
-    ];
+    const lines = ["type Config struct {", "    Name string", "}"];
     const entries = await generateOutline(lines, "file.go");
     assert.equal(entries.length, 1);
     assert.equal(entries[0].kind, "struct");

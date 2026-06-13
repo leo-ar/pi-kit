@@ -31,20 +31,29 @@ notes/                     TODO, retrospectives, tree-sitter analysis
 
 1. `tool_result` event fires for `read` tool calls
 2. Guard: skip if file has offset/limit, is unsupported, or is below threshold
-3. Anti-loop: track outlined files per session — second full read passes through, third re-outlines
-4. `generateOutline()` dispatches to language-specific generator (tree-sitter for PHP/Elisp, regex for rest)
-5. `formatOutlineResult()` produces compact outline with preserved header section
-6. Returns `{ content: [{ type: "text", text: outline }] }` to replace full content
+3. Anti-loop: track outlined files per session — second full read passes
+   through, third re-outlines
+4. `generateOutline()` dispatches to language-specific generator (tree-sitter
+   for PHP/Elisp, regex for rest)
+5. `formatOutlineResult()` produces compact outline with preserved header
+   section
+6. Returns `{ content: [{ type: "text", text: outline }] }` to replace full
+   content
 
 ## Design decisions
 
 - Hook `tool_result` not register a tool — zero system prompt overhead per turn
-- Anti-loop prevents infinite outline cycles (agent reads → gets outline → re-reads full → passes through)
-- Tree-sitter for PHP (17% regex error rate → 0%) and Elisp (regex can't parse s-expressions)
-- Regex for TS/JS/Go/Rust/Python/Ruby/CSS/HTML — 0-1% error rate, no grammar overhead
-- Tree-sitter is lazy-loaded (18ms cold, 2.3ms warm) — only initializes on first PHP/Elisp read
+- Anti-loop prevents infinite outline cycles (agent reads → gets outline →
+  re-reads full → passes through)
+- Tree-sitter for PHP (17% regex error rate → 0%) and Elisp (regex can't parse
+  s-expressions)
+- Regex for TS/JS/Go/Rust/Python/Ruby/CSS/HTML — 0-1% error rate, no grammar
+  overhead
+- Tree-sitter is lazy-loaded (18ms cold, 2.3ms warm) — only initializes on first
+  PHP/Elisp read
 - Graceful fallback: if WASM fails, PHP falls back to regex (`php-regex.ts`)
-- Status widget shows live-process cumulative savings: `📐 8KB` (resets on restart or `/reload`; use `bench.ts` for historical session replay)
+- Status widget shows live-process cumulative savings: `📐 8KB` (resets on
+  restart or `/reload`; use `bench.ts` for historical session replay)
 
 ## Testing
 

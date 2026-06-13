@@ -3,7 +3,13 @@ import { SUPPORTED_EXTENSIONS, type Lang, type TextContent } from "./types.ts";
 export function extractText(content: unknown): TextContent | undefined {
   if (!Array.isArray(content)) return undefined;
   for (const block of content) {
-    if (block && typeof block === "object" && "type" in block && block.type === "text" && "text" in block) {
+    if (
+      block &&
+      typeof block === "object" &&
+      "type" in block &&
+      block.type === "text" &&
+      "text" in block
+    ) {
       return block as TextContent;
     }
   }
@@ -19,22 +25,37 @@ export function isSupportedFile(filePath: string): boolean {
 export function detectLanguage(filePath: string): Lang {
   const ext = filePath.slice(filePath.lastIndexOf(".")).toLowerCase();
   const map: Record<string, Lang> = {
-    ".ts": "typescript", ".tsx": "typescript", ".mts": "typescript",
-    ".js": "javascript", ".jsx": "javascript", ".mjs": "javascript",
-    ".py": "python", ".pyi": "python",
+    ".ts": "typescript",
+    ".tsx": "typescript",
+    ".mts": "typescript",
+    ".js": "javascript",
+    ".jsx": "javascript",
+    ".mjs": "javascript",
+    ".py": "python",
+    ".pyi": "python",
     ".rs": "rust",
     ".go": "go",
     ".java": "java",
-    ".kt": "kotlin", ".kts": "kotlin",
+    ".kt": "kotlin",
+    ".kts": "kotlin",
     ".cs": "csharp",
-    ".c": "c", ".h": "c",
-    ".cpp": "cpp", ".hpp": "cpp", ".cc": "cpp", ".cxx": "cpp",
+    ".c": "c",
+    ".h": "c",
+    ".cpp": "cpp",
+    ".hpp": "cpp",
+    ".cc": "cpp",
+    ".cxx": "cpp",
     ".rb": "ruby",
     ".swift": "swift",
     ".zig": "zig",
     ".php": "php",
-    ".css": "css", ".scss": "css", ".less": "css",
-    ".html": "html", ".htm": "html", ".vue": "html", ".svelte": "html",
+    ".css": "css",
+    ".scss": "css",
+    ".less": "css",
+    ".html": "html",
+    ".htm": "html",
+    ".vue": "html",
+    ".svelte": "html",
     ".el": "elisp",
   };
   return map[ext] ?? "unknown";

@@ -6,6 +6,8 @@
 import type { OutlineEntry } from "../types.ts";
 import { generatePhpOutlineTS } from "./php-ts.ts";
 
-export async function generatePhpOutline(lines: string[]): Promise<OutlineEntry[]> {
+export async function generatePhpOutline(
+  lines: string[],
+): Promise<OutlineEntry[]> {
   return generatePhpOutlineTS(lines);
 }

@@ -13,7 +13,13 @@ export function generateGoOutline(lines: string[]): OutlineEntry[] {
       const name = fnMatch[2];
       const exported = name[0] === name[0].toUpperCase();
       const endLine = findBlockEnd(lines, i);
-      entries.push({ kind: "fn", name, startLine: i + 1, endLine: endLine + 1, exported });
+      entries.push({
+        kind: "fn",
+        name,
+        startLine: i + 1,
+        endLine: endLine + 1,
+        exported,
+      });
       continue;
     }
 
@@ -24,7 +30,13 @@ export function generateGoOutline(lines: string[]): OutlineEntry[] {
       const kind = typeMatch[2];
       const exported = name[0] === name[0].toUpperCase();
       const endLine = findBlockEnd(lines, i);
-      entries.push({ kind, name, startLine: i + 1, endLine: endLine + 1, exported });
+      entries.push({
+        kind,
+        name,
+        startLine: i + 1,
+        endLine: endLine + 1,
+        exported,
+      });
       continue;
     }
 
@@ -33,7 +45,13 @@ export function generateGoOutline(lines: string[]): OutlineEntry[] {
     if (constMatch) {
       const name = constMatch[2];
       const exported = name[0] === name[0].toUpperCase();
-      entries.push({ kind: "const", name, startLine: i + 1, endLine: i + 1, exported });
+      entries.push({
+        kind: "const",
+        name,
+        startLine: i + 1,
+        endLine: i + 1,
+        exported,
+      });
     }
   }
 

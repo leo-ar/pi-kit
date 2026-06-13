@@ -9,8 +9,7 @@ absolute priority is to eradicate a bug surgically without creating
 # Current Project Context
 
 1. Update `notes/TODO.md` to set **Active Mode: Fix**.
-2. Please inspect `CLAUDE.md` to review the layout and testing
-   strategies.
+2. Please inspect `CLAUDE.md` to review the layout and testing strategies.
 
 # The Issue Profile
 
@@ -28,8 +27,10 @@ designing a reproduction mechanism. Provide a response with:
    failure mode to happen (e.g., state corruption, boundary condition slip).
 2. **Failing Reproduction Test Proposal:** Propose a targeted test case that
    _guarantees a failure_ on the current broken code.
-   - If the bug stems from corrupted internal or shared state, propose an _internal property test_ reaching into the components via escape hatches.
-   - If it is a clean, single logic boundary failure, propose an _error/example test_.
+   - If the bug stems from corrupted internal or shared state, propose an
+     _internal property test_ reaching into the components via escape hatches.
+   - If it is a clean, single logic boundary failure, propose an _error/example
+     test_.
 
 **CRITICAL:** Output only the analysis and the reproduction test code. Run the
 test runner if executing locally to confirm the test fails. **Stop and wait for

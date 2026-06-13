@@ -21,8 +21,8 @@ describe("generatePhpOutline (tree-sitter) — edge cases that regex got wrong",
       "}",
     ];
     const result = await generatePhpOutline(lines);
-    const render = result.find(e => e.name === "render");
-    const other = result.find(e => e.name === "other");
+    const render = result.find((e) => e.name === "render");
+    const other = result.find((e) => e.name === "other");
 
     assert.ok(render, "should find render method");
     assert.ok(other, "should find other method");
@@ -51,9 +51,9 @@ describe("generatePhpOutline (tree-sitter) — edge cases that regex got wrong",
       "}",
     ];
     const result = await generatePhpOutline(lines);
-    const factory = result.find(e => e.name === "Factory");
-    const create = result.find(e => e.name === "create");
-    const destroy = result.find(e => e.name === "destroy");
+    const factory = result.find((e) => e.name === "Factory");
+    const create = result.find((e) => e.name === "create");
+    const destroy = result.find((e) => e.name === "destroy");
 
     assert.ok(factory, "should find Factory class");
     assert.ok(create, "should find create method");
@@ -82,8 +82,8 @@ describe("generatePhpOutline (tree-sitter) — edge cases that regex got wrong",
       "}",
     ];
     const result = await generatePhpOutline(lines);
-    const process = result.find(e => e.name === "process");
-    const handle = result.find(e => e.name === "handle");
+    const process = result.find((e) => e.name === "process");
+    const handle = result.find((e) => e.name === "handle");
 
     assert.ok(process, "should find process method");
     assert.ok(handle, "should find handle method");
@@ -109,8 +109,8 @@ describe("generatePhpOutline (tree-sitter) — edge cases that regex got wrong",
       "}",
     ];
     const result = await generatePhpOutline(lines);
-    const create = result.find(e => e.name === "create");
-    const del = result.find(e => e.name === "delete");
+    const create = result.find((e) => e.name === "create");
+    const del = result.find((e) => e.name === "delete");
 
     assert.ok(create, "should find create");
     assert.ok(del, "should find delete");
@@ -138,8 +138,8 @@ describe("generatePhpOutline (tree-sitter) — edge cases that regex got wrong",
       "}",
     ];
     const result = await generatePhpOutline(lines);
-    const routes = result.find(e => e.name === "routes");
-    const index = result.find(e => e.name === "index");
+    const routes = result.find((e) => e.name === "routes");
+    const index = result.find((e) => e.name === "index");
 
     assert.ok(routes, "should find routes");
     assert.ok(index, "should find index");

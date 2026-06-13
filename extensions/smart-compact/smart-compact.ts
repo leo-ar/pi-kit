@@ -16,7 +16,10 @@
 
 import { complete } from "@earendil-works/pi-ai";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { convertToLlm, serializeConversation } from "@earendil-works/pi-coding-agent";
+import {
+  convertToLlm,
+  serializeConversation,
+} from "@earendil-works/pi-coding-agent";
 
 import { extractFacts } from "./extraction.ts";
 import { compactPipeline } from "./pipeline.ts";
@@ -27,7 +30,15 @@ import type { CompactEffect } from "./pipeline.ts";
 export default function smartCompact(pi: ExtensionAPI) {
   pi.on("session_before_compact", async (event, ctx) => {
     const { preparation, signal } = event;
-    const { messagesToSummarize, turnPrefixMessages, tokensBefore, firstKeptEntryId, previousSummary, isSplitTurn, fileOps } = preparation;
+    const {
+      messagesToSummarize,
+      turnPrefixMessages,
+      tokensBefore,
+      firstKeptEntryId,
+      previousSummary,
+      isSplitTurn,
+      fileOps,
+    } = preparation;
 
     // Combine all messages to summarize
     const allMessages = [...messagesToSummarize, ...turnPrefixMessages];
@@ -35,7 +46,9 @@ export default function smartCompact(pi: ExtensionAPI) {
 
     // Convert to LLM format for the pipeline
     const llmMessages = convertToLlm(allMessages);
-    const llmTurnPrefixMessages = isSplitTurn ? convertToLlm(turnPrefixMessages) : undefined;
+    const llmTurnPrefixMessages = isSplitTurn
+      ? convertToLlm(turnPrefixMessages)
+      : undefined;
 
     // Estimate conversation budget: leave room for prompt overhead + output
     const model = ctx.model;
@@ -66,9 +79,15 @@ export default function smartCompact(pi: ExtensionAPI) {
           break;
 
         case "get_auth": {
-          const authResult = await ctx.modelRegistry.getApiKeyAndHeaders(effect.model as any);
+          const authResult = await ctx.modelRegistry.getApiKeyAndHeaders(
+            effect.model as any,
+          );
           response = authResult.ok
-            ? { ok: true, apiKey: authResult.apiKey, headers: authResult.headers }
+            ? {
+                ok: true,
+                apiKey: authResult.apiKey,
+                headers: authResult.headers,
+              }
             : { ok: false };
           break;
         }
@@ -105,13 +124,19 @@ export default function smartCompact(pi: ExtensionAPI) {
             );
 
             response = result.content
-              .filter((c): c is { type: "text"; text: string } => c.type === "text")
+              .filter(
+                (c): c is { type: "text"; text: string } => c.type === "text",
+              )
               .map((c) => c.text)
               .join("\n");
           } catch (error) {
             if (signal.aborted) return;
-            const message = error instanceof Error ? error.message : String(error);
-            ctx.ui.notify(`smart-compact: ${message}, using default compaction`, "error");
+            const message =
+              error instanceof Error ? error.message : String(error);
+            ctx.ui.notify(
+              `smart-compact: ${message}, using default compaction`,
+              "error",
+            );
             return;
           }
           break;
@@ -135,11 +160,14 @@ export default function smartCompact(pi: ExtensionAPI) {
   });
 
   pi.registerCommand("compact-stats", {
-    description: "Show what smart-compact would extract from the current session",
+    description:
+      "Show what smart-compact would extract from the current session",
     handler: async (_args, ctx) => {
       const branch = ctx.sessionManager.getBranch();
       const agentMessages = branch
-        .filter((e): e is { type: "message"; message: any } => e.type === "message")
+        .filter(
+          (e): e is { type: "message"; message: any } => e.type === "message",
+        )
         .map((e) => e.message);
 
       if (agentMessages.length === 0) {
@@ -150,14 +178,15 @@ export default function smartCompact(pi: ExtensionAPI) {
       const messages = convertToLlm(agentMessages);
       const extraction = extractFacts(messages);
 
-
       const summary = [
         `${extraction.files.modified.size} modified`,
         `${extraction.files.read.size} read`,
         `${extraction.errors.length} errors`,
         `${extraction.decisions.length} decisions`,
         extraction.goal ? `goal: ${extraction.goal.slice(0, 60)}` : null,
-      ].filter(Boolean).join(", ");
+      ]
+        .filter(Boolean)
+        .join(", ");
 
       ctx.ui.notify(summary);
     },

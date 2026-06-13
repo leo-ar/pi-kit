@@ -1,7 +1,11 @@
 import { MAX_HEADER_LINES, type OutlineEntry } from "./types.ts";
 import { padRight } from "./utils.ts";
 
-export function formatOutlineResult(filePath: string, lines: string[], entries: OutlineEntry[]): string {
+export function formatOutlineResult(
+  filePath: string,
+  lines: string[],
+  entries: OutlineEntry[],
+): string {
   const totalLines = lines.length;
   const header = extractHeader(lines);
 
@@ -22,17 +26,22 @@ export function formatOutlineResult(filePath: string, lines: string[], entries: 
   parts.push("── outline ──");
   for (const entry of entries) {
     const vis = entry.exported ? "E" : "-";
-    const span = entry.startLine === entry.endLine
-      ? `${entry.startLine}`
-      : `${entry.startLine}:${entry.endLine}`;
+    const span =
+      entry.startLine === entry.endLine
+        ? `${entry.startLine}`
+        : `${entry.startLine}:${entry.endLine}`;
     parts.push(`  ${vis} ${padRight(entry.kind, 5)} ${entry.name} [${span}]`);
   }
 
   // Hint
   parts.push("");
   parts.push("── hint ──");
-  parts.push(`File has ${totalLines} lines. Use read with offset/limit to view specific sections.`);
-  parts.push(`Example: read(path="${filePath}", offset=<startLine>, limit=<count>)`);
+  parts.push(
+    `File has ${totalLines} lines. Use read with offset/limit to view specific sections.`,
+  );
+  parts.push(
+    `Example: read(path="${filePath}", offset=<startLine>, limit=<count>)`,
+  );
 
   return parts.join("\n");
 }

@@ -1,7 +1,7 @@
 # AGENTS.md — repo layout and conventions
 
-> Begin every session by reading this file and `notes/TODO.md` to determine
-> the active mode and current task.
+> Begin every session by reading this file and `notes/TODO.md` to determine the
+> active mode and current task.
 
 ## Project Overview
 
@@ -12,8 +12,8 @@ developer (Leo) via `pi install` or project-local `.pi/` placement.
 
 ## Local runtime context
 
-`pi-rtk-optimizer` is installed globally through `~/.pi/agent/settings.json`.
-It rewrites bash commands via `rtk rewrite` and compacts noisy bash/tool output
+`pi-rtk-optimizer` is installed globally through `~/.pi/agent/settings.json`. It
+rewrites bash commands via `rtk rewrite` and compacts noisy bash/tool output
 (test/build/git/lint/search). Source `read` compaction is disabled, so RTK does
 not compete with `read-outline`; file reads remain exact unless `read-outline`
 itself replaces a large full-file read with an outline.

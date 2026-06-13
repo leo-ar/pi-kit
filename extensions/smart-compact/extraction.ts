@@ -100,7 +100,11 @@ export function extractFacts(messages: Message[]): Extraction {
         if (args.path) {
           if (name === "read" || name === "read_hashed") {
             files.read.add(args.path);
-          } else if (name === "write" || name === "edit" || name === "hashline_edit") {
+          } else if (
+            name === "write" ||
+            name === "edit" ||
+            name === "hashline_edit"
+          ) {
             files.modified.add(args.path);
           }
         }

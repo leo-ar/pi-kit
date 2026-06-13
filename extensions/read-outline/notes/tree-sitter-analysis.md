@@ -2,7 +2,8 @@
 
 ## Summary
 
-**Verdict: Use tree-sitter selectively — only for Elisp (and Org-mode later). Keep regex for brace-based languages.**
+**Verdict: Use tree-sitter selectively — only for Elisp (and Org-mode later).
+Keep regex for brace-based languages.**
 
 ## Performance Results
 
@@ -35,7 +36,8 @@ macro_definition     → (defmacro NAME (args) body)
 special_form         → (defvar NAME value), (defcustom ...), etc.
 ```
 
-Walking is trivial: iterate `root.childCount`, match by `node.type`, extract `child(2)` as the name symbol.
+Walking is trivial: iterate `root.childCount`, match by `node.type`, extract
+`child(2)` as the name symbol.
 
 ## Why NOT retrofit tree-sitter for all languages?
 
@@ -75,7 +77,8 @@ These edge cases **do occur in real code** — especially in TypeScript.
 A tree-sitter-for-all approach would:
 
 - **Eliminate `block-end.ts` entirely** (79 lines) — AST gives exact spans
-- **Replace each language file** with a small config: "which node types are outline-worthy?"
+- **Replace each language file** with a small config: "which node types are
+  outline-worthy?"
 - **Reduce total code by ~70%** for equivalent or better results
 
 ### Dependency weight
@@ -86,7 +89,9 @@ A tree-sitter-for-all approach would:
 | Grammars we use (elisp+css+php+html+ts+js) | 3.8MB |
 | **Grammars if only elisp**                 | 52KB  |
 
-3.8MB for all grammars is significant for an extension. But: these are static `.wasm` files loaded lazily on demand — only the grammar for the current file's language loads.
+3.8MB for all grammars is significant for an extension. But: these are static
+`.wasm` files loaded lazily on demand — only the grammar for the current file's
+language loads.
 
 ### Summary table
 
@@ -105,7 +110,9 @@ A tree-sitter-for-all approach would:
 - **No prebuilt WASM** in `tree-sitter-wasms` package
 - Would need to build from source: `tree-sitter build --wasm`
 - This adds a build step to the extension (or we commit the .wasm)
-- **Recommendation: Delay Org-mode.** Focus on Elisp first (prebuilt WASM available, proven grammar). Add Org-mode later once the tree-sitter infrastructure is in place.
+- **Recommendation: Delay Org-mode.** Focus on Elisp first (prebuilt WASM
+  available, proven grammar). Add Org-mode later once the tree-sitter
+  infrastructure is in place.
 
 ## Proposed Architecture
 
@@ -125,9 +132,11 @@ src/
 
 Key design points:
 
-- **Lazy init:** Only `Parser.init()` on first elisp file read (not at extension load)
+- **Lazy init:** Only `Parser.init()` on first elisp file read (not at extension
+  load)
 - **Grammar bundled:** Commit `tree-sitter-elisp.wasm` to the repo (52KB)
-- **Graceful fallback:** If WASM fails to load, fall back to a simple regex Elisp generator
+- **Graceful fallback:** If WASM fails to load, fall back to a simple regex
+  Elisp generator
 - **web-tree-sitter as dep:** No native compilation needed, works everywhere
 
 ## Decision
@@ -160,7 +169,9 @@ Key design points:
 
 ### Rationale for deferring TS/JS
 
-- 99% accuracy is sufficient for outline purpose (agent decides what to read in detail)
+- 99% accuracy is sufficient for outline purpose (agent decides what to read in
+  detail)
 - 2.3MB grammar adds significant weight for marginal improvement
-- Phase 1 validates the walker pattern; TS/JS becomes trivial follow-up if needed
+- Phase 1 validates the walker pattern; TS/JS becomes trivial follow-up if
+  needed
 - Re-run bench after Phase 1 and decide with data

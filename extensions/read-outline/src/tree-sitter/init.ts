@@ -49,7 +49,9 @@ export async function getParser(lang: string): Promise<any | null> {
     await ensureInit();
 
     if (!languageCache.has(lang)) {
-      const langObj = await Parser.Language.load(join(GRAMMAR_DIR, grammarFile));
+      const langObj = await Parser.Language.load(
+        join(GRAMMAR_DIR, grammarFile),
+      );
       languageCache.set(lang, langObj);
     }
 
@@ -67,7 +69,10 @@ export async function getParser(lang: string): Promise<any | null> {
  * Parse source code using tree-sitter.
  * Returns the root node, or null if parsing fails.
  */
-export async function parseSource(lang: string, source: string): Promise<any | null> {
+export async function parseSource(
+  lang: string,
+  source: string,
+): Promise<any | null> {
   const parser = await getParser(lang);
   if (!parser) return null;
 

@@ -82,11 +82,7 @@ describe("generateCssOutline — examples", () => {
   });
 
   it("handles element selectors", () => {
-    const lines = [
-      "h1 {",
-      "  font-size: 2rem;",
-      "}",
-    ];
+    const lines = ["h1 {", "  font-size: 2rem;", "}"];
     const result = generateCssOutline(lines);
     assert.equal(result.length, 1);
     assert.equal(result[0].name, "h1");
@@ -126,7 +122,7 @@ describe("generateCssOutline — examples", () => {
       "}",
     ];
     const result = generateCssOutline(lines);
-    const importRule = result.find(e => e.name.startsWith("@import"));
+    const importRule = result.find((e) => e.name.startsWith("@import"));
     assert.ok(importRule);
     assert.equal(importRule!.kind, "at-rule");
     assert.equal(importRule!.startLine, importRule!.endLine); // single-line

@@ -30,36 +30,62 @@ function nextToolCallId(): string {
   return `tc_${++toolCallCounter}`;
 }
 
-const arbTextContent: fc.Arbitrary<TextContent> = fc.string({ minLength: 1, maxLength: 2000 }).map(
-  (text) => ({ type: "text" as const, text })
-);
+const arbTextContent: fc.Arbitrary<TextContent> = fc
+  .string({ minLength: 1, maxLength: 2000 })
+  .map((text) => ({ type: "text" as const, text }));
 
-const arbLargeTextContent: fc.Arbitrary<TextContent> = fc.string({ minLength: 600, maxLength: 3000 }).map(
-  (text) => ({ type: "text" as const, text })
-);
+const arbLargeTextContent: fc.Arbitrary<TextContent> = fc
+  .string({ minLength: 600, maxLength: 3000 })
+  .map((text) => ({ type: "text" as const, text }));
 
 const arbToolName = fc.constantFrom("read", "bash", "edit", "write", "search");
 
 const arbFilePath = fc.constantFrom(
-  "src/index.ts", "README.md", "package.json", "lib/utils.ts",
-  "test/foo.test.ts", "src/components/App.tsx"
+  "src/index.ts",
+  "README.md",
+  "package.json",
+  "lib/utils.ts",
+  "test/foo.test.ts",
+  "src/components/App.tsx",
 );
 
 const arbBashCommand = fc.constantFrom(
-  "ls -la", "find . -name '*.ts'", "grep -r 'foo' src/",
-  "cat src/index.ts", "npm test", "git status",
-  "node build.js", "echo hello", "tree src/"
+  "ls -la",
+  "find . -name '*.ts'",
+  "grep -r 'foo' src/",
+  "cat src/index.ts",
+  "npm test",
+  "git status",
+  "node build.js",
+  "echo hello",
+  "tree src/",
 );
 
-function arbToolCall(): fc.Arbitrary<{ block: ToolCallBlock; result: ToolResultMessage }> {
-  return fc.tuple(arbToolName, arbFilePath, arbBashCommand, arbLargeTextContent, fc.boolean()).map(
-    ([toolName, path, command, content, isError]) => {
+function arbToolCall(): fc.Arbitrary<{
+  block: ToolCallBlock;
+  result: ToolResultMessage;
+}> {
+  return fc
+    .tuple(
+      arbToolName,
+      arbFilePath,
+      arbBashCommand,
+      arbLargeTextContent,
+      fc.boolean(),
+    )
+    .map(([toolName, path, command, content, isError]) => {
       const id = nextToolCallId();
-      const args: Record<string, unknown> = toolName === "read" || toolName === "edit" || toolName === "write"
-        ? { path }
-        : { command };
+      const args: Record<string, unknown> =
+        toolName === "read" || toolName === "edit" || toolName === "write"
+          ? { path }
+          : { command };
 
-      const block: ToolCallBlock = { type: "toolCall", id, name: toolName, arguments: args };
+      const block: ToolCallBlock = {
+        type: "toolCall",
+        id,
+        name: toolName,
+        arguments: args,
+      };
       const result: ToolResultMessage = {
         role: "toolResult",
         toolCallId: id,
@@ -69,8 +95,7 @@ function arbToolCall(): fc.Arbitrary<{ block: ToolCallBlock; result: ToolResultM
         timestamp: Date.now(),
       };
       return { block, result };
-    }
-  );
+    });
 }
 
 function arbUserMessage(): fc.Arbitrary<UserMessage> {
@@ -85,29 +110,32 @@ function arbUserMessage(): fc.Arbitrary<UserMessage> {
  * Generate a realistic conversation: alternating user → assistant (with tool calls) → tool results.
  * Returns a flat message array.
  */
-function arbConversation(minTurns: number, maxTurns: number): fc.Arbitrary<AnyMessage[]> {
+function arbConversation(
+  minTurns: number,
+  maxTurns: number,
+): fc.Arbitrary<AnyMessage[]> {
   return fc.integer({ min: minTurns, max: maxTurns }).chain((numTurns) => {
     // Each turn: user + assistant (1-3 tool calls) + tool results
-    const turnArb = fc.tuple(
-      arbUserMessage(),
-      fc.integer({ min: 1, max: 3 })
-    ).chain(([userMsg, numTools]) => {
-      return fc.array(arbToolCall(), { minLength: numTools, maxLength: numTools }).map(
-        (toolCalls) => {
-          const assistantContent: (TextContent | ToolCallBlock)[] = toolCalls.map(tc => tc.block);
-          const assistant: AssistantMessage = {
-            role: "assistant",
-            content: assistantContent,
-          };
-          const results = toolCalls.map(tc => tc.result);
-          return [userMsg, assistant, ...results] as AnyMessage[];
-        }
-      );
-    });
+    const turnArb = fc
+      .tuple(arbUserMessage(), fc.integer({ min: 1, max: 3 }))
+      .chain(([userMsg, numTools]) => {
+        return fc
+          .array(arbToolCall(), { minLength: numTools, maxLength: numTools })
+          .map((toolCalls) => {
+            const assistantContent: (TextContent | ToolCallBlock)[] =
+              toolCalls.map((tc) => tc.block);
+            const assistant: AssistantMessage = {
+              role: "assistant",
+              content: assistantContent,
+            };
+            const results = toolCalls.map((tc) => tc.result);
+            return [userMsg, assistant, ...results] as AnyMessage[];
+          });
+      });
 
-    return fc.array(turnArb, { minLength: numTurns, maxLength: numTurns }).map(
-      (turns) => turns.flat()
-    );
+    return fc
+      .array(turnArb, { minLength: numTurns, maxLength: numTurns })
+      .map((turns) => turns.flat());
   });
 }
 
@@ -123,14 +151,13 @@ const arbConfig: fc.Arbitrary<PrunerConfig> = fc.record({
 // ─── Properties ──────────────────────────────────────────────────────────────
 
 describe("prune() property tests", () => {
-
   it("P1: message count preserved — stubs never remove messages", () => {
     fc.assert(
       fc.property(arbConversation(3, 12), arbConfig, (messages, config) => {
         const { messages: pruned } = prune(messages, config);
         assert.equal(pruned.length, messages.length);
       }),
-      { numRuns: NUM_RUNS }
+      { numRuns: NUM_RUNS },
     );
   });
 
@@ -157,7 +184,7 @@ describe("prune() property tests", () => {
           assert.deepEqual(pruned[i], messages[i]);
         }
       }),
-      { numRuns: NUM_RUNS }
+      { numRuns: NUM_RUNS },
     );
   });
 
@@ -174,12 +201,12 @@ describe("prune() property tests", () => {
             const resultLen = getContentLength(result);
             assert.ok(
               resultLen <= origLen,
-              `Stub at index ${i} is longer: ${resultLen} > ${origLen}`
+              `Stub at index ${i} is longer: ${resultLen} > ${origLen}`,
             );
           }
         }
       }),
-      { numRuns: NUM_RUNS }
+      { numRuns: NUM_RUNS },
     );
   });
 
@@ -194,7 +221,7 @@ describe("prune() property tests", () => {
           }
         }
       }),
-      { numRuns: NUM_RUNS }
+      { numRuns: NUM_RUNS },
     );
   });
 
@@ -205,7 +232,7 @@ describe("prune() property tests", () => {
         const second = prune(first.messages, config);
         assert.deepEqual(second.messages, first.messages);
       }),
-      { numRuns: NUM_RUNS }
+      { numRuns: NUM_RUNS },
     );
   });
 
@@ -227,7 +254,7 @@ describe("prune() property tests", () => {
 
         assert.equal(stats.charsSaved, computedSavings);
       }),
-      { numRuns: NUM_RUNS }
+      { numRuns: NUM_RUNS },
     );
   });
 
@@ -237,7 +264,7 @@ describe("prune() property tests", () => {
         const { stats } = prune(messages, config);
         assert.equal(stats.pruned + stats.kept, stats.totalToolResults);
       }),
-      { numRuns: NUM_RUNS }
+      { numRuns: NUM_RUNS },
     );
   });
 });

@@ -142,7 +142,10 @@ function benchSlice(slice: CompactionSlice): BenchResult {
   const critical = criticalErrors(extraction.errors);
   const gaps = verify(slice.piSummary, extraction);
 
-  const fileGaps = gaps.filter((g) => g.startsWith("Modified file") || g.startsWith("Missing modified file"));
+  const fileGaps = gaps.filter(
+    (g) =>
+      g.startsWith("Modified file") || g.startsWith("Missing modified file"),
+  );
   const errorGaps = gaps.filter((g) => g.startsWith("Missing error"));
 
   return {
@@ -172,10 +175,15 @@ function main() {
   const args = process.argv.slice(2);
   const isLive = args.includes("--live");
   const verbose = args.includes("--verbose") || args.includes("-v");
-  const limit = parseInt(args.find((a) => a.startsWith("--limit="))?.split("=")[1] ?? "0") || Infinity;
+  const limit =
+    parseInt(
+      args.find((a) => a.startsWith("--limit="))?.split("=")[1] ?? "0",
+    ) || Infinity;
 
   if (isLive) {
-    console.log("⚠️  --live mode not yet implemented (requires API key plumbing)");
+    console.log(
+      "⚠️  --live mode not yet implemented (requires API key plumbing)",
+    );
     console.log("   Running in --dry mode instead.\n");
   }
 
@@ -208,43 +216,82 @@ function main() {
 
   // Aggregate stats
   const totalMessages = results.reduce((s, r) => s + r.messageCount, 0);
-  const totalFileGaps = results.reduce((s, r) => s + r.piCoverage.fileGaps.length, 0);
-  const totalErrorGaps = results.reduce((s, r) => s + r.piCoverage.errorGaps.length, 0);
+  const totalFileGaps = results.reduce(
+    (s, r) => s + r.piCoverage.fileGaps.length,
+    0,
+  );
+  const totalErrorGaps = results.reduce(
+    (s, r) => s + r.piCoverage.errorGaps.length,
+    0,
+  );
   const totalGaps = results.reduce((s, r) => s + r.piCoverage.totalGaps, 0);
-  const totalModifiedFiles = results.reduce((s, r) => s + r.extraction.modifiedFiles, 0);
-  const totalAllErrors = results.reduce((s, r) => s + r.extraction.totalErrors, 0);
-  const totalCritical = results.reduce((s, r) => s + r.extraction.criticalErrors, 0);
-  const avgSummaryLen = results.reduce((s, r) => s + r.piSummaryLength, 0) / results.length;
+  const totalModifiedFiles = results.reduce(
+    (s, r) => s + r.extraction.modifiedFiles,
+    0,
+  );
+  const totalAllErrors = results.reduce(
+    (s, r) => s + r.extraction.totalErrors,
+    0,
+  );
+  const totalCritical = results.reduce(
+    (s, r) => s + r.extraction.criticalErrors,
+    0,
+  );
+  const avgSummaryLen =
+    results.reduce((s, r) => s + r.piSummaryLength, 0) / results.length;
 
-  const fileCoverage = totalModifiedFiles > 0
-    ? ((totalModifiedFiles - totalFileGaps) / totalModifiedFiles * 100).toFixed(1)
-    : "N/A";
-  const errorCoverage = totalCritical > 0
-    ? ((totalCritical - totalErrorGaps) / totalCritical * 100).toFixed(1)
-    : "N/A";
+  const fileCoverage =
+    totalModifiedFiles > 0
+      ? (
+          ((totalModifiedFiles - totalFileGaps) / totalModifiedFiles) *
+          100
+        ).toFixed(1)
+      : "N/A";
+  const errorCoverage =
+    totalCritical > 0
+      ? (((totalCritical - totalErrorGaps) / totalCritical) * 100).toFixed(1)
+      : "N/A";
 
-  console.log("═══════════════════════════════════════════════════════════════");
+  console.log(
+    "═══════════════════════════════════════════════════════════════",
+  );
   console.log("  Pi Default Compaction — Coverage Analysis (via our verifier)");
-  console.log("═══════════════════════════════════════════════════════════════\n");
+  console.log(
+    "═══════════════════════════════════════════════════════════════\n",
+  );
   console.log(`  Messages analyzed:      ${totalMessages}`);
   console.log(`  Avg summary length:     ${Math.round(avgSummaryLen)} chars`);
   console.log();
   console.log(`  Modified files found:   ${totalModifiedFiles}`);
-  console.log(`  File mention coverage:  ${fileCoverage}% (${totalFileGaps} gaps)`);
+  console.log(
+    `  File mention coverage:  ${fileCoverage}% (${totalFileGaps} gaps)`,
+  );
   console.log();
   console.log(`  Total errors extracted: ${totalAllErrors}`);
-  console.log(`  Critical errors:        ${totalCritical} (after filtering transient)`);
-  console.log(`  Critical error coverage:${errorCoverage}% (${totalErrorGaps} gaps)`);
+  console.log(
+    `  Critical errors:        ${totalCritical} (after filtering transient)`,
+  );
+  console.log(
+    `  Critical error coverage:${errorCoverage}% (${totalErrorGaps} gaps)`,
+  );
   console.log(`  Total verification gaps: ${totalGaps}\n`);
 
   if (verbose) {
-    console.log("─── Per-Slice Details ───────────────────────────────────────\n");
+    console.log(
+      "─── Per-Slice Details ───────────────────────────────────────\n",
+    );
     for (const r of results) {
       console.log(`  ${r.sessionFile} (${r.messageCount} msgs)`);
       console.log(`    Goal: ${r.extraction.goal?.slice(0, 80) ?? "(none)"}`);
-      console.log(`    Files: ${r.extraction.modifiedFiles} modified, ${r.extraction.readFiles} read`);
-      console.log(`    Errors: ${r.extraction.totalErrors} total, ${r.extraction.criticalErrors} critical`);
-      console.log(`    Gaps: ${r.piCoverage.totalGaps} (${r.piCoverage.fileGaps.length} file, ${r.piCoverage.errorGaps.length} error)`);
+      console.log(
+        `    Files: ${r.extraction.modifiedFiles} modified, ${r.extraction.readFiles} read`,
+      );
+      console.log(
+        `    Errors: ${r.extraction.totalErrors} total, ${r.extraction.criticalErrors} critical`,
+      );
+      console.log(
+        `    Gaps: ${r.piCoverage.totalGaps} (${r.piCoverage.fileGaps.length} file, ${r.piCoverage.errorGaps.length} error)`,
+      );
       if (r.piCoverage.fileGaps.length > 0) {
         for (const gap of r.piCoverage.fileGaps.slice(0, 3)) {
           console.log(`      ⚠ ${gap}`);
@@ -256,16 +303,22 @@ function main() {
 
   // Summary verdict
   const gapRate = totalGaps / results.length;
-  console.log("─── Verdict ────────────────────────────────────────────────────\n");
+  console.log(
+    "─── Verdict ────────────────────────────────────────────────────\n",
+  );
   if (gapRate < 0.5) {
     console.log("  ✅ Pi's default compaction has good coverage.");
-    console.log("     smart-compact's value is primarily structural (better format)\n");
+    console.log(
+      "     smart-compact's value is primarily structural (better format)\n",
+    );
   } else if (gapRate < 2) {
     console.log("  ⚠️  Moderate gaps in pi's default compaction.");
     console.log("     smart-compact's verification step would catch these.\n");
   } else {
     console.log("  ❌ Significant gaps in pi's default compaction.");
-    console.log("     smart-compact would materially improve context retention.\n");
+    console.log(
+      "     smart-compact would materially improve context retention.\n",
+    );
   }
 }
 

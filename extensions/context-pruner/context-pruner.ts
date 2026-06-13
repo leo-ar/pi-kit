@@ -9,7 +9,12 @@
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { prune, DEFAULT_CONFIG, type PrunerConfig, type AnyMessage } from "./pruning.ts";
+import {
+  prune,
+  DEFAULT_CONFIG,
+  type PrunerConfig,
+  type AnyMessage,
+} from "./pruning.ts";
 
 export default function contextPruner(pi: ExtensionAPI) {
   let config: PrunerConfig = { ...DEFAULT_CONFIG };
@@ -38,10 +43,7 @@ export default function contextPruner(pi: ExtensionAPI) {
     }
 
     const saved = formatBytes(totalSaved);
-    ctx.ui.setStatus(
-      "prune-stats",
-      `🪓 ${saved} K${config.recentTurnsToKeep}`
-    );
+    ctx.ui.setStatus("prune-stats", `🪓 ${saved} K${config.recentTurnsToKeep}`);
 
     return { messages: pruned };
   });
@@ -79,7 +81,9 @@ export default function contextPruner(pi: ExtensionAPI) {
     description: "Set how many recent turns to keep unpruned",
     handler: async (args, ctx) => {
       if (!args || !args.trim()) {
-        ctx.ui.notify(`K${config.recentTurnsToKeep} — keeping ${config.recentTurnsToKeep} recent turns`);
+        ctx.ui.notify(
+          `K${config.recentTurnsToKeep} — keeping ${config.recentTurnsToKeep} recent turns`,
+        );
         return;
       }
       const num = Number(args.trim());
@@ -88,7 +92,9 @@ export default function contextPruner(pi: ExtensionAPI) {
         return;
       }
       config.recentTurnsToKeep = Math.round(num);
-      ctx.ui.notify(`K${config.recentTurnsToKeep} — keeping ${config.recentTurnsToKeep} recent turns`);
+      ctx.ui.notify(
+        `K${config.recentTurnsToKeep} — keeping ${config.recentTurnsToKeep} recent turns`,
+      );
     },
   });
 
@@ -122,7 +128,8 @@ export default function contextPruner(pi: ExtensionAPI) {
         }
         (config as Record<string, unknown>)[key] = num;
       } else if (typeof current === "boolean") {
-        (config as Record<string, unknown>)[key] = value === "true" || value === "1";
+        (config as Record<string, unknown>)[key] =
+          value === "true" || value === "1";
       }
       ctx.ui.notify(`${key} = ${(config as Record<string, unknown>)[key]}`);
     },

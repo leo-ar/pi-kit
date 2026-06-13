@@ -32,7 +32,9 @@ function makeToolResult(opts: {
   };
 }
 
-function makeAssistant(toolCalls: { id: string; name: string; arguments: Record<string, unknown> }[]): AssistantMessage {
+function makeAssistant(
+  toolCalls: { id: string; name: string; arguments: Record<string, unknown> }[],
+): AssistantMessage {
   return {
     role: "assistant",
     content: toolCalls.map((tc) => ({
@@ -49,22 +51,39 @@ function makeUser(text: string = "do something"): AnyMessage {
 }
 
 function bigText(lines: number): string {
-  return Array.from({ length: lines }, (_, i) => `line ${i}: ${"x".repeat(80)}`).join("\n");
+  return Array.from(
+    { length: lines },
+    (_, i) => `line ${i}: ${"x".repeat(80)}`,
+  ).join("\n");
 }
 
 // ─── classify() ──────────────────────────────────────────────────────────────
 
 describe("classify", () => {
   it("keeps error results", () => {
-    const msg = makeToolResult({ toolName: "bash", text: bigText(10), isError: true });
-    const result = classify(msg, { command: "npm test" }, new Set(), DEFAULT_CONFIG);
+    const msg = makeToolResult({
+      toolName: "bash",
+      text: bigText(10),
+      isError: true,
+    });
+    const result = classify(
+      msg,
+      { command: "npm test" },
+      new Set(),
+      DEFAULT_CONFIG,
+    );
     assert.equal(result.action, "keep");
     assert.equal(result.reason, "error");
   });
 
   it("keeps small results", () => {
     const msg = makeToolResult({ toolName: "bash", text: "ok" });
-    const result = classify(msg, { command: "echo hi" }, new Set(), DEFAULT_CONFIG);
+    const result = classify(
+      msg,
+      { command: "echo hi" },
+      new Set(),
+      DEFAULT_CONFIG,
+    );
     assert.equal(result.action, "keep");
     assert.equal(result.reason, "small");
   });
@@ -78,7 +97,12 @@ describe("classify", () => {
 
   it("stubs old read results", () => {
     const msg = makeToolResult({ toolName: "read", text: bigText(100) });
-    const result = classify(msg, { path: "src/foo.ts" }, new Set(), DEFAULT_CONFIG);
+    const result = classify(
+      msg,
+      { path: "src/foo.ts" },
+      new Set(),
+      DEFAULT_CONFIG,
+    );
     assert.equal(result.action, "stub");
     assert.equal(result.reason, "read-old");
     assert.match(result.stub, /\[read src\/foo\.ts — \d+ lines\]/);
@@ -87,7 +111,12 @@ describe("classify", () => {
   it("stubs superseded read results with note", () => {
     const msg = makeToolResult({ toolName: "read", text: bigText(50) });
     const written = new Set(["src/foo.ts"]);
-    const result = classify(msg, { path: "src/foo.ts" }, written, DEFAULT_CONFIG);
+    const result = classify(
+      msg,
+      { path: "src/foo.ts" },
+      written,
+      DEFAULT_CONFIG,
+    );
     assert.equal(result.action, "stub");
     assert.equal(result.reason, "read-superseded");
     assert.match(result.stub, /file was later modified/);
@@ -95,7 +124,12 @@ describe("classify", () => {
 
   it("stubs old ls results", () => {
     const msg = makeToolResult({ toolName: "bash", text: bigText(30) });
-    const result = classify(msg, { command: "ls -la src/" }, new Set(), DEFAULT_CONFIG);
+    const result = classify(
+      msg,
+      { command: "ls -la src/" },
+      new Set(),
+      DEFAULT_CONFIG,
+    );
     assert.equal(result.action, "stub");
     assert.equal(result.reason, "bash-informational");
     assert.match(result.stub, /\[ls src\/ — \d+ entries\]/);
@@ -103,7 +137,12 @@ describe("classify", () => {
 
   it("stubs old find results", () => {
     const msg = makeToolResult({ toolName: "bash", text: bigText(50) });
-    const result = classify(msg, { command: "find . -name '*.ts'" }, new Set(), DEFAULT_CONFIG);
+    const result = classify(
+      msg,
+      { command: "find . -name '*.ts'" },
+      new Set(),
+      DEFAULT_CONFIG,
+    );
     assert.equal(result.action, "stub");
     assert.equal(result.reason, "bash-informational");
     assert.match(result.stub, /\[find \. — \d+ results\]/);
@@ -111,7 +150,12 @@ describe("classify", () => {
 
   it("stubs old cat results", () => {
     const msg = makeToolResult({ toolName: "bash", text: bigText(80) });
-    const result = classify(msg, { command: "cat README.md" }, new Set(), DEFAULT_CONFIG);
+    const result = classify(
+      msg,
+      { command: "cat README.md" },
+      new Set(),
+      DEFAULT_CONFIG,
+    );
     assert.equal(result.action, "stub");
     assert.equal(result.reason, "bash-informational");
     assert.match(result.stub, /\[cat README\.md — \d+ lines\]/);
@@ -119,7 +163,12 @@ describe("classify", () => {
 
   it("stubs old grep results", () => {
     const msg = makeToolResult({ toolName: "bash", text: bigText(20) });
-    const result = classify(msg, { command: "grep 'export' src/" }, new Set(), DEFAULT_CONFIG);
+    const result = classify(
+      msg,
+      { command: "grep 'export' src/" },
+      new Set(),
+      DEFAULT_CONFIG,
+    );
     assert.equal(result.action, "stub");
     assert.equal(result.reason, "bash-search");
     assert.match(result.stub, /\[grep "export" — \d+ lines\]/);
@@ -127,15 +176,28 @@ describe("classify", () => {
 
   it("stubs large unknown bash results", () => {
     const msg = makeToolResult({ toolName: "bash", text: bigText(40) });
-    const result = classify(msg, { command: "gh api repos/foo/bar" }, new Set(), DEFAULT_CONFIG);
+    const result = classify(
+      msg,
+      { command: "gh api repos/foo/bar" },
+      new Set(),
+      DEFAULT_CONFIG,
+    );
     assert.equal(result.action, "stub");
     assert.equal(result.reason, "bash-large");
-    assert.match(result.stub, /\[bash: gh api repos\/foo\/bar — [\d.]+KB output, exit 0\]/);
+    assert.match(
+      result.stub,
+      /\[bash: gh api repos\/foo\/bar — [\d.]+KB output, exit 0\]/,
+    );
   });
 
   it("keeps small unknown bash results", () => {
     const msg = makeToolResult({ toolName: "bash", text: "done" });
-    const result = classify(msg, { command: "echo done" }, new Set(), DEFAULT_CONFIG);
+    const result = classify(
+      msg,
+      { command: "echo done" },
+      new Set(),
+      DEFAULT_CONFIG,
+    );
     assert.equal(result.action, "keep");
     assert.equal(result.reason, "small");
   });
@@ -222,8 +284,14 @@ describe("prune", () => {
   it("keeps all messages when fewer turns than threshold", () => {
     const msgs: AnyMessage[] = [
       makeUser(),
-      makeAssistant([{ id: "tc_1", name: "read", arguments: { path: "big.ts" } }]),
-      makeToolResult({ toolCallId: "tc_1", toolName: "read", text: bigText(100) }),
+      makeAssistant([
+        { id: "tc_1", name: "read", arguments: { path: "big.ts" } },
+      ]),
+      makeToolResult({
+        toolCallId: "tc_1",
+        toolName: "read",
+        text: bigText(100),
+      }),
     ];
     const { stats } = prune(msgs, { ...DEFAULT_CONFIG, recentTurnsToKeep: 10 });
     assert.equal(stats.pruned, 0);
@@ -235,8 +303,18 @@ describe("prune", () => {
     for (let i = 0; i < 15; i++) {
       const id = `tc_${i}`;
       msgs.push(makeUser(`read file ${i}`));
-      msgs.push(makeAssistant([{ id, name: "read", arguments: { path: `file${i}.ts` } }]));
-      msgs.push(makeToolResult({ toolCallId: id, toolName: "read", text: bigText(100) }));
+      msgs.push(
+        makeAssistant([
+          { id, name: "read", arguments: { path: `file${i}.ts` } },
+        ]),
+      );
+      msgs.push(
+        makeToolResult({
+          toolCallId: id,
+          toolName: "read",
+          text: bigText(100),
+        }),
+      );
     }
     const config = { ...DEFAULT_CONFIG, recentTurnsToKeep: 5 };
     const { messages, stats } = prune(msgs, config);
@@ -254,18 +332,48 @@ describe("prune", () => {
     const msgs: AnyMessage[] = [];
     // Turn 1: read foo.ts
     msgs.push(makeUser("read"));
-    msgs.push(makeAssistant([{ id: "tc_read", name: "read", arguments: { path: "foo.ts" } }]));
-    msgs.push(makeToolResult({ toolCallId: "tc_read", toolName: "read", text: bigText(50) }));
+    msgs.push(
+      makeAssistant([
+        { id: "tc_read", name: "read", arguments: { path: "foo.ts" } },
+      ]),
+    );
+    msgs.push(
+      makeToolResult({
+        toolCallId: "tc_read",
+        toolName: "read",
+        text: bigText(50),
+      }),
+    );
     // Turn 2-12: padding to push turn 1 out of recent window
     for (let i = 0; i < 11; i++) {
       msgs.push(makeUser(`padding ${i}`));
-      msgs.push(makeAssistant([{ id: `tc_pad_${i}`, name: "bash", arguments: { command: "echo ok" } }]));
-      msgs.push(makeToolResult({ toolCallId: `tc_pad_${i}`, toolName: "bash", text: "ok" }));
+      msgs.push(
+        makeAssistant([
+          {
+            id: `tc_pad_${i}`,
+            name: "bash",
+            arguments: { command: "echo ok" },
+          },
+        ]),
+      );
+      msgs.push(
+        makeToolResult({
+          toolCallId: `tc_pad_${i}`,
+          toolName: "bash",
+          text: "ok",
+        }),
+      );
     }
     // Turn 13: write foo.ts (supersedes the read)
     msgs.push(makeUser("write"));
-    msgs.push(makeAssistant([{ id: "tc_write", name: "write", arguments: { path: "foo.ts" } }]));
-    msgs.push(makeToolResult({ toolCallId: "tc_write", toolName: "write", text: "ok" }));
+    msgs.push(
+      makeAssistant([
+        { id: "tc_write", name: "write", arguments: { path: "foo.ts" } },
+      ]),
+    );
+    msgs.push(
+      makeToolResult({ toolCallId: "tc_write", toolName: "write", text: "ok" }),
+    );
 
     const config = { ...DEFAULT_CONFIG, recentTurnsToKeep: 3 };
     const { messages, stats } = prune(msgs, config);
@@ -280,8 +388,14 @@ describe("prune", () => {
     for (let i = 0; i < 12; i++) {
       const id = `tc_${i}`;
       msgs.push(makeUser(`turn ${i}`));
-      msgs.push(makeAssistant([{ id, name: "bash", arguments: { command: "cat bigfile.txt" } }]));
-      msgs.push(makeToolResult({ toolCallId: id, toolName: "bash", text: bigText(50) }));
+      msgs.push(
+        makeAssistant([
+          { id, name: "bash", arguments: { command: "cat bigfile.txt" } },
+        ]),
+      );
+      msgs.push(
+        makeToolResult({ toolCallId: id, toolName: "bash", text: bigText(50) }),
+      );
     }
     const config = { ...DEFAULT_CONFIG, recentTurnsToKeep: 2 };
     const { stats } = prune(msgs, config);

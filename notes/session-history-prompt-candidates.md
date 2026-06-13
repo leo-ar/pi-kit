@@ -2,7 +2,8 @@
 
 Source: `~/.pi/agent/sessions/**.jsonl`
 
-Privacy mode: aggregate metrics only. No proprietary file bodies or long user/session snippets were copied into this note.
+Privacy mode: aggregate metrics only. No proprietary file bodies or long
+user/session snippets were copied into this note.
 
 ## Aggregate scan
 
@@ -33,7 +34,8 @@ Candidate prompt:
 Likely behavior:
 
 - Inspect current branch vs base.
-- Summarize intent, changed files, risky areas, test coverage, and review comments.
+- Summarize intent, changed files, risky areas, test coverage, and review
+  comments.
 - Prefer aggregate git/diff commands first, then targeted reads.
 - Produce concise review findings grouped by severity.
 - Avoid applying edits unless explicitly requested.
@@ -46,7 +48,8 @@ Potential arguments:
 
 ### 2. Implementation audit / bug audit
 
-Why: coding/debug/audit sessions are fewer but extremely tool-heavy and compaction-heavy.
+Why: coding/debug/audit sessions are fewer but extremely tool-heavy and
+compaction-heavy.
 
 Candidate prompt:
 
@@ -68,7 +71,8 @@ Potential arguments:
 
 ### 3. Migration / cleanup workflow
 
-Why: exploration-summary category contains long, repetitive, tool-heavy sessions with many compactions.
+Why: exploration-summary category contains long, repetitive, tool-heavy sessions
+with many compactions.
 
 Candidate prompt:
 
@@ -92,7 +96,8 @@ Potential arguments:
 
 ### 4. Investigation workflow launcher
 
-Why: fewer sessions, but very compaction-heavy and high-value. This likely overlaps with the existing `analysis-workflow-init` skill.
+Why: fewer sessions, but very compaction-heavy and high-value. This likely
+overlaps with the existing `analysis-workflow-init` skill.
 
 Candidate prompt:
 
@@ -111,7 +116,8 @@ Potential arguments:
 /investigate <question> [data/source constraints]
 ```
 
-Recommendation: this may be better as a thin prompt that invokes or reminds the agent to use the `analysis-workflow-init` skill when a workspace is needed.
+Recommendation: this may be better as a thin prompt that invokes or reminds the
+agent to use the `analysis-workflow-init` skill when a workspace is needed.
 
 ### 5. pi extension development prompt
 
@@ -123,7 +129,8 @@ Candidate prompt:
 
 Likely behavior:
 
-- Read root `AGENTS.md`, `notes/TODO.md`, `extensions/AGENTS.md`, and target extension `AGENTS.md`.
+- Read root `AGENTS.md`, `notes/TODO.md`, `extensions/AGENTS.md`, and target
+  extension `AGENTS.md`.
 - Identify correct pi extension surface.
 - Use current pi 0.78.1 APIs/types.
 - Include test/run instructions (`pi -e`, `/reload`).
@@ -137,7 +144,8 @@ Potential arguments:
 
 ### 6. Model/cost mode prompt
 
-Why: session history shows frequent model switching and historical migration from Bedrock to Anthropic/Copilot.
+Why: session history shows frequent model switching and historical migration
+from Bedrock to Anthropic/Copilot.
 
 Candidate prompt:
 
@@ -158,7 +166,8 @@ Potential arguments:
 
 ## Tool usage pattern
 
-Highest-volume sessions are bash-heavy, with read/edit/write following. This supports existing optimizers:
+Highest-volume sessions are bash-heavy, with read/edit/write following. This
+supports existing optimizers:
 
 - RTK for bash output noise.
 - `read-outline` for large full-file reads.
@@ -180,4 +189,5 @@ Start with `/pr-review` because it has the strongest historical signal:
 - 49 compactions
 - 83 model changes
 
-Second choice: `/audit-code`, because the sessions are fewer but very expensive/tool-heavy.
+Second choice: `/audit-code`, because the sessions are fewer but very
+expensive/tool-heavy.

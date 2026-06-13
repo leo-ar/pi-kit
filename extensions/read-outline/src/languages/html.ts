@@ -2,12 +2,25 @@ import type { OutlineEntry } from "../types.ts";
 
 /** Semantic/structural HTML tags worth outlining */
 const SEMANTIC_TAGS = new Set([
-  "html", "head", "body",
-  "header", "footer", "main", "nav", "aside",
-  "section", "article",
-  "form", "table", "dialog",
-  "script", "style", "template",
-  "div", "ul", "ol",
+  "html",
+  "head",
+  "body",
+  "header",
+  "footer",
+  "main",
+  "nav",
+  "aside",
+  "section",
+  "article",
+  "form",
+  "table",
+  "dialog",
+  "script",
+  "style",
+  "template",
+  "div",
+  "ul",
+  "ol",
 ]);
 
 export function generateHtmlOutline(lines: string[]): OutlineEntry[] {
@@ -39,7 +52,13 @@ export function generateHtmlOutline(lines: string[]): OutlineEntry[] {
     // Find closing tag
     const endLine = findHtmlBlockEnd(lines, i, tagName);
 
-    entries.push({ kind: "tag", name, startLine: i + 1, endLine: endLine + 1, exported: true });
+    entries.push({
+      kind: "tag",
+      name,
+      startLine: i + 1,
+      endLine: endLine + 1,
+      exported: true,
+    });
   }
 
   return entries;
@@ -49,7 +68,11 @@ export function generateHtmlOutline(lines: string[]): OutlineEntry[] {
  * Find the matching closing tag for an opening tag.
  * Handles nesting of the same tag name.
  */
-function findHtmlBlockEnd(lines: string[], startIdx: number, tagName: string): number {
+function findHtmlBlockEnd(
+  lines: string[],
+  startIdx: number,
+  tagName: string,
+): number {
   // Self-closing check
   const startLine = lines[startIdx];
   if (startLine.match(/\/>\s*$/)) return startIdx;

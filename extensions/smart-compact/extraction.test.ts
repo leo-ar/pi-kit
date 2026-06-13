@@ -29,19 +29,37 @@ const arbToolCall = (name: string, path: string): ContentBlock => ({
 });
 
 const arbReadToolCall = arbFilePath.map((p) =>
-  arbToolCall(fc.sample(fc.oneof(fc.constant("read"), fc.constant("read_hashed")), 1)[0], p),
+  arbToolCall(
+    fc.sample(fc.oneof(fc.constant("read"), fc.constant("read_hashed")), 1)[0],
+    p,
+  ),
 );
 
 const arbWriteToolCall = arbFilePath.map((p) =>
-  arbToolCall(fc.sample(fc.oneof(fc.constant("write"), fc.constant("edit"), fc.constant("hashline_edit")), 1)[0], p),
+  arbToolCall(
+    fc.sample(
+      fc.oneof(
+        fc.constant("write"),
+        fc.constant("edit"),
+        fc.constant("hashline_edit"),
+      ),
+      1,
+    )[0],
+    p,
+  ),
 );
 
 const arbAssistantMessage = fc
-  .array(fc.oneof(arbReadToolCall, arbWriteToolCall), { minLength: 1, maxLength: 5 })
-  .map((blocks): Message => ({
-    role: "assistant",
-    content: blocks,
-  }));
+  .array(fc.oneof(arbReadToolCall, arbWriteToolCall), {
+    minLength: 1,
+    maxLength: 5,
+  })
+  .map(
+    (blocks): Message => ({
+      role: "assistant",
+      content: blocks,
+    }),
+  );
 
 const arbUserMessage = fc.string({ minLength: 0, maxLength: 500 }).map(
   (text): Message => ({
@@ -55,11 +73,13 @@ const arbToolResultMessage = fc
     isError: fc.boolean(),
     text: fc.string({ minLength: 0, maxLength: 200 }),
   })
-  .map(({ isError, text }): Message => ({
-    role: "toolResult",
-    isError,
-    content: [{ type: "text", text }],
-  }));
+  .map(
+    ({ isError, text }): Message => ({
+      role: "toolResult",
+      isError,
+      content: [{ type: "text", text }],
+    }),
+  );
 
 const arbMessages = fc.array(
   fc.oneof(arbUserMessage, arbAssistantMessage, arbToolResultMessage),
@@ -123,10 +143,22 @@ describe("extractFacts — properties", () => {
       fc.property(arbMessages, (msgs) => {
         const extraction = extractFacts(msgs);
 
-        assert(extraction.errors.length <= 10, `errors: ${extraction.errors.length}`);
-        assert(extraction.decisions.length <= 10, `decisions: ${extraction.decisions.length}`);
-        assert(extraction.constraints.length <= 8, `constraints: ${extraction.constraints.length}`);
-        assert(extraction.goal.length <= 300, `goal length: ${extraction.goal.length}`);
+        assert(
+          extraction.errors.length <= 10,
+          `errors: ${extraction.errors.length}`,
+        );
+        assert(
+          extraction.decisions.length <= 10,
+          `decisions: ${extraction.decisions.length}`,
+        );
+        assert(
+          extraction.constraints.length <= 8,
+          `constraints: ${extraction.constraints.length}`,
+        );
+        assert(
+          extraction.goal.length <= 300,
+          `goal length: ${extraction.goal.length}`,
+        );
       }),
       { numRuns: 20 },
     );
@@ -140,7 +172,13 @@ describe("extractFacts — examples", () => {
     const msgs: Message[] = [
       {
         role: "assistant",
-        content: [{ type: "toolCall", name: "write", arguments: { path: "src/app.ts" } }],
+        content: [
+          {
+            type: "toolCall",
+            name: "write",
+            arguments: { path: "src/app.ts" },
+          },
+        ],
       },
     ];
     const result = extractFacts(msgs);
@@ -167,7 +205,12 @@ describe("extractFacts — examples", () => {
       {
         role: "toolResult",
         isError: true,
-        content: [{ type: "text", text: "TypeError: cannot read property 'foo' of undefined" }],
+        content: [
+          {
+            type: "text",
+            text: "TypeError: cannot read property 'foo' of undefined",
+          },
+        ],
       },
     ];
     const result = extractFacts(msgs);
@@ -177,7 +220,15 @@ describe("extractFacts — examples", () => {
 
   it("extracts goal from first substantial user message", () => {
     const msgs: Message[] = [
-      { role: "user", content: [{ type: "text", text: "Refactor the compaction system to use generators" }] },
+      {
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: "Refactor the compaction system to use generators",
+          },
+        ],
+      },
     ];
     const result = extractFacts(msgs);
     assert(result.goal.includes("Refactor the compaction system"));
@@ -196,7 +247,10 @@ describe("extractFacts — examples", () => {
       },
     ];
     const result = extractFacts(msgs);
-    assert(result.constraints.length >= 3, `Expected >=3 constraints, got ${result.constraints.length}`);
+    assert(
+      result.constraints.length >= 3,
+      `Expected >=3 constraints, got ${result.constraints.length}`,
+    );
   });
 });
 

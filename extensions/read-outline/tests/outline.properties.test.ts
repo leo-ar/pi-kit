@@ -57,7 +57,7 @@ const goLineArb = fc.array(
     fc.constant("    Name string"),
     fc.constant("const maxRetries = 3"),
     fc.constant("// comment"),
-    fc.constant('package main'),
+    fc.constant("package main"),
     fc.constant("type Reader interface {"),
     fc.constant("    Read(p []byte) (int, error)"),
   ),
@@ -78,8 +78,14 @@ describe("generateOutline — property: valid line ranges", () => {
           const entries = await generateOutline(lines, path);
           for (const entry of entries) {
             assert.ok(entry.startLine >= 1, `startLine ${entry.startLine} < 1`);
-            assert.ok(entry.endLine >= entry.startLine, `endLine ${entry.endLine} < startLine ${entry.startLine}`);
-            assert.ok(entry.endLine <= lines.length, `endLine ${entry.endLine} > totalLines ${lines.length}`);
+            assert.ok(
+              entry.endLine >= entry.startLine,
+              `endLine ${entry.endLine} < startLine ${entry.startLine}`,
+            );
+            assert.ok(
+              entry.endLine <= lines.length,
+              `endLine ${entry.endLine} > totalLines ${lines.length}`,
+            );
           }
         }),
         { numRuns: 200 },
@@ -115,7 +121,11 @@ describe("generateOutline — property: names are non-empty identifiers", () => 
           const entries = await generateOutline(lines, path);
           for (const entry of entries) {
             assert.ok(entry.name.length > 0, "name is empty");
-            assert.match(entry.name, /^\w+[?!]?$/, `name "${entry.name}" is not a valid identifier`);
+            assert.match(
+              entry.name,
+              /^\w+[?!]?$/,
+              `name "${entry.name}" is not a valid identifier`,
+            );
           }
         }),
         { numRuns: 200 },

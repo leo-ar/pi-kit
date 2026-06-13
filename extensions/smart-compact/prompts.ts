@@ -19,9 +19,15 @@ export function buildSynthesisPrompt(
     `Goal: ${extraction.goal || "(not explicitly stated)"}`,
     `Files modified: ${[...extraction.files.modified].join(", ") || "none"}`,
     `Files read: ${[...extraction.files.read].join(", ") || "none"}`,
-    extraction.errors.length ? `Unresolved errors:\n${extraction.errors.map((e) => `  - ${e}`).join("\n")}` : "",
-    extraction.decisions.length ? `Key decisions:\n${extraction.decisions.map((d) => `  - ${d}`).join("\n")}` : "",
-    extraction.constraints.length ? `Constraints:\n${extraction.constraints.map((c) => `  - ${c}`).join("\n")}` : "",
+    extraction.errors.length
+      ? `Unresolved errors:\n${extraction.errors.map((e) => `  - ${e}`).join("\n")}`
+      : "",
+    extraction.decisions.length
+      ? `Key decisions:\n${extraction.decisions.map((d) => `  - ${d}`).join("\n")}`
+      : "",
+    extraction.constraints.length
+      ? `Constraints:\n${extraction.constraints.map((c) => `  - ${c}`).join("\n")}`
+      : "",
     `</extracted-facts>`,
   ]
     .filter(Boolean)

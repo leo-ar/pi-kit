@@ -1,7 +1,11 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import fc from "fast-check";
-import { formatOutlineResult, extractHeader, isHeaderLine } from "../src/format.ts";
+import {
+  formatOutlineResult,
+  extractHeader,
+  isHeaderLine,
+} from "../src/format.ts";
 import type { OutlineEntry } from "../src/types.ts";
 
 describe("formatOutlineResult — examples", () => {
@@ -28,11 +32,7 @@ describe("formatOutlineResult — examples", () => {
   });
 
   it("omits imports section when no header lines", () => {
-    const lines = [
-      "export function foo() {",
-      "  return 1;",
-      "}",
-    ];
+    const lines = ["export function foo() {", "  return 1;", "}"];
     const entries: OutlineEntry[] = [
       { kind: "fn", name: "foo", startLine: 1, endLine: 3, exported: true },
     ];
@@ -78,12 +78,7 @@ describe("extractHeader — examples", () => {
   });
 
   it("extracts Python imports", () => {
-    const lines = [
-      "import os",
-      "from pathlib import Path",
-      "",
-      "def main():",
-    ];
+    const lines = ["import os", "from pathlib import Path", "", "def main():"];
     const header = extractHeader(lines);
     assert.equal(header.length, 2);
   });
@@ -100,11 +95,7 @@ describe("extractHeader — examples", () => {
   });
 
   it("returns empty for file with no header", () => {
-    const lines = [
-      "export function foo() {",
-      "  return 1;",
-      "}",
-    ];
+    const lines = ["export function foo() {", "  return 1;", "}"];
     const header = extractHeader(lines);
     assert.equal(header.length, 0);
   });
@@ -136,26 +127,43 @@ describe("isHeaderLine", () => {
 });
 
 describe("formatOutlineResult — property: always contains required sections", () => {
-  const entryArb = fc.record({
-    kind: fc.constantFrom("fn", "class", "const", "interface", "type", "enum"),
-    name: fc.stringMatching(/^[a-zA-Z]\w{0,10}$/),
-    startLine: fc.integer({ min: 1, max: 100 }),
-    endLine: fc.integer({ min: 1, max: 200 }),
-    exported: fc.boolean(),
-  }).map(e => ({ ...e, endLine: Math.max(e.startLine, e.endLine) }));
+  const entryArb = fc
+    .record({
+      kind: fc.constantFrom(
+        "fn",
+        "class",
+        "const",
+        "interface",
+        "type",
+        "enum",
+      ),
+      name: fc.stringMatching(/^[a-zA-Z]\w{0,10}$/),
+      startLine: fc.integer({ min: 1, max: 100 }),
+      endLine: fc.integer({ min: 1, max: 200 }),
+      exported: fc.boolean(),
+    })
+    .map((e) => ({ ...e, endLine: Math.max(e.startLine, e.endLine) }));
 
   it("always includes filePath, outline section, and hint section", () => {
     fc.assert(
       fc.property(
-        fc.string({ minLength: 1, maxLength: 30 }).filter(s => !s.includes("\n")),
+        fc
+          .string({ minLength: 1, maxLength: 30 })
+          .filter((s) => !s.includes("\n")),
         fc.array(fc.string({ maxLength: 80 }), { minLength: 1, maxLength: 50 }),
         fc.array(entryArb, { minLength: 1, maxLength: 10 }),
         (filePath, lines, entries) => {
           const result = formatOutlineResult(filePath, lines, entries);
           assert.ok(result.includes(filePath), "missing filePath");
-          assert.ok(result.includes("── outline ──"), "missing outline section");
+          assert.ok(
+            result.includes("── outline ──"),
+            "missing outline section",
+          );
           assert.ok(result.includes("── hint ──"), "missing hint section");
-          assert.ok(result.includes("offset"), "missing offset reference in hint");
+          assert.ok(
+            result.includes("offset"),
+            "missing offset reference in hint",
+          );
         },
       ),
       { numRuns: 200 },

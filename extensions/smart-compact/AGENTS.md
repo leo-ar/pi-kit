@@ -19,11 +19,15 @@ bench.ts               Offline benchmark against real sessions
 
 ## Key types
 
-- `PipelineInput` — `{ messages, previousSummary, fileOps, isSplitTurn, turnPrefixMessages }`
-- `PipelineEffect` — union: `ExtractEffect | SynthesizeEffect | VerifyEffect | DoneEffect`
-- `ExtractionResult` — `{ filesModified, filesRead, errors, decisions, constraints, goal }`
+- `PipelineInput` —
+  `{ messages, previousSummary, fileOps, isSplitTurn, turnPrefixMessages }`
+- `PipelineEffect` — union:
+  `ExtractEffect | SynthesizeEffect | VerifyEffect | DoneEffect`
+- `ExtractionResult` —
+  `{ filesModified, filesRead, errors, decisions, constraints, goal }`
 - `VerificationResult` — `{ missingFiles, missingErrors, patchedSummary }`
-- `isTransientError(msg)` — 25-pattern classifier filtering noise from real errors
+- `isTransientError(msg)` — 25-pattern classifier filtering noise from real
+  errors
 
 ## Pipeline flow
 
@@ -43,8 +47,10 @@ the summary. See `verification.ts` → `TRANSIENT_PATTERNS`.
 
 ## Design decisions
 
-- Generator-effects over DI — pure generator is fully testable with script-runner
-- `patchSummary` only patches errors, not files — file tags unconditionally appended
+- Generator-effects over DI — pure generator is fully testable with
+  script-runner
+- `patchSummary` only patches errors, not files — file tags unconditionally
+  appended
 - `reasoningEffort: "low"` — cheaper compaction, quality is sufficient
 - `maxConversationChars` cap — prevents sending >200K to the LLM
 

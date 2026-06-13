@@ -49,8 +49,8 @@ aggressively removed to maintain a lean context.
 
 ### RETROS
 
-Continuous logs populated at the end of every outer loop.
-They function as a raw stream of project memory.
+Continuous logs populated at the end of every outer loop. They function as a raw
+stream of project memory.
 
 The individual entry isn't where the magic happens. The value is unlocked when
 the human periodically pauses to read multiple retros together to extract

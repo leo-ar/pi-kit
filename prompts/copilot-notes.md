@@ -7,9 +7,11 @@ Triage GitHub Copilot review notes for the current repository/PR. Input: `$@`.
 
 Repository-adaptive setup:
 
-- Load local guidance if present: `AGENTS.md`, `.pi/SYSTEM.md`, `README.md`, `CONTRIBUTING.md`, PR template, test config.
+- Load local guidance if present: `AGENTS.md`, `.pi/SYSTEM.md`, `README.md`,
+  `CONTRIBUTING.md`, PR template, test config.
 - If `$@` includes pasted notes, use them as the source of truth.
-- If `$@` includes a PR URL or asks you to inspect the PR, use `gh` if available; otherwise ask me to paste the notes.
+- If `$@` includes a PR URL or asks you to inspect the PR, use `gh` if
+  available; otherwise ask me to paste the notes.
 
 Safety:
 

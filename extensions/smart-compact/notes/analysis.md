@@ -66,7 +66,7 @@ Pi's built-in compaction accepts a `thinkingLevel`. For compaction, low thinking
 budget saves latency/cost:
 
 ```typescript
-reasoningEffort: "low"
+reasoningEffort: "low";
 ```
 
 ### Closing instruction after `</conversation>`
@@ -110,8 +110,14 @@ type CompactEffect =
   | { tag: "get_model" }
   | { tag: "get_auth"; model: Model }
   | { tag: "notify"; message: string; level: "info" | "warning" | "error" }
-  | { tag: "llm_complete"; prompt: string; model: Model; apiKey: string;
-      headers?: Record<string, string>; signal?: AbortSignal };
+  | {
+      tag: "llm_complete";
+      prompt: string;
+      model: Model;
+      apiKey: string;
+      headers?: Record<string, string>;
+      signal?: AbortSignal;
+    };
 ```
 
 The event handler becomes a thin runner that interprets effects with real I/O.
@@ -121,22 +127,22 @@ Tests step through the generator feeding scripted responses.
 
 ## Property Test Invariants
 
-| Invariant | Property |
-|-----------|----------|
+| Invariant                  | Property                                                                                                    |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | File tracking completeness | `for ALL messages with write/edit tool calls, extractFacts(msgs).files.modified ⊇ {paths from those calls}` |
-| Read/modified disjointness | `for ALL extractions, extraction.files.read ∩ extraction.files.modified = ∅` |
-| Verification soundness | `for ALL summaries containing all modified filenames, verify(summary, extraction) returns []` |
-| Patch idempotence | `patchSummary(patchSummary(s, gaps, ext), gaps, ext) === patchSummary(s, gaps, ext)` |
-| Totality (smoke) | `extractFacts() never throws on any well-formed message array` |
-| Bounded output | `extraction.errors.length ≤ 10 && extraction.decisions.length ≤ 10 && extraction.constraints.length ≤ 8` |
+| Read/modified disjointness | `for ALL extractions, extraction.files.read ∩ extraction.files.modified = ∅`                                |
+| Verification soundness     | `for ALL summaries containing all modified filenames, verify(summary, extraction) returns []`               |
+| Patch idempotence          | `patchSummary(patchSummary(s, gaps, ext), gaps, ext) === patchSummary(s, gaps, ext)`                        |
+| Totality (smoke)           | `extractFacts() never throws on any well-formed message array`                                              |
+| Bounded output             | `extraction.errors.length ≤ 10 && extraction.decisions.length ≤ 10 && extraction.constraints.length ≤ 8`    |
 
 ---
 
 ## Minor Issues
 
-| Issue | Notes |
-|-------|-------|
+| Issue                                                                      | Notes                                                                   |
+| -------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
 | `ContentBlock` type defined locally; doesn't match pi's actual block types | Import from `@earendil-works/pi-ai` or align with `convertToLlm` output |
-| Goal detection heuristic (`text.length > 20`) grabs injected context | Consider skipping messages that look like system prompt injections |
-| No handling of `preparation.isSplitTurn` / `turnPrefixMessages` | These need a shorter prefix summary, not the main compaction summary |
-| `compact-stats` command uses `ui.notify` which is length-limited | Consider `ctx.ui.custom()` with scrollable display for diagnostics |
+| Goal detection heuristic (`text.length > 20`) grabs injected context       | Consider skipping messages that look like system prompt injections      |
+| No handling of `preparation.isSplitTurn` / `turnPrefixMessages`            | These need a shorter prefix summary, not the main compaction summary    |
+| `compact-stats` command uses `ui.notify` which is length-limited           | Consider `ctx.ui.custom()` with scrollable display for diagnostics      |

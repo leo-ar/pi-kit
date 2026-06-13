@@ -21,9 +21,7 @@ describe("generateElispOutline — examples", () => {
   });
 
   it("detects defvar", async () => {
-    const lines = [
-      '(defvar my-var 42 "A variable.")',
-    ];
+    const lines = ['(defvar my-var 42 "A variable.")'];
     const result = await generateElispOutline(lines);
     assert.strictEqual(result.length, 1);
     assert.strictEqual(result[0].name, "my-var");
@@ -33,10 +31,7 @@ describe("generateElispOutline — examples", () => {
   });
 
   it("detects defmacro", async () => {
-    const lines = [
-      "(defmacro my-macro (body)",
-      "  `(progn ,body))",
-    ];
+    const lines = ["(defmacro my-macro (body)", "  `(progn ,body))"];
     const result = await generateElispOutline(lines);
     assert.strictEqual(result.length, 1);
     assert.strictEqual(result[0].name, "my-macro");
@@ -62,7 +57,7 @@ describe("generateElispOutline — examples", () => {
     const lines = [
       "(define-minor-mode my-mode",
       '  "Toggle my-mode."',
-      "  :lighter \" My\"",
+      '  :lighter " My"',
       "  :keymap my-mode-map)",
     ];
     const result = await generateElispOutline(lines);
@@ -96,10 +91,10 @@ describe("generateElispOutline — examples", () => {
   it("marks double-dash names as internal (not exported)", async () => {
     const lines = [
       "(defun my-pkg--internal ()",
-      "  (message \"internal\"))",
+      '  (message "internal"))',
       "",
       "(defun my-pkg-public ()",
-      "  (message \"public\"))",
+      '  (message "public"))',
     ];
     const result = await generateElispOutline(lines);
     assert.strictEqual(result.length, 2);
@@ -113,7 +108,7 @@ describe("generateElispOutline — examples", () => {
     const lines = [
       "(require 'cl-lib)",
       "",
-      "(message \"hello\")",
+      '(message "hello")',
       "",
       "(provide 'my-pkg)",
     ];
@@ -122,10 +117,7 @@ describe("generateElispOutline — examples", () => {
   });
 
   it("handles defconst", async () => {
-    const lines = [
-      '(defconst my-version "1.0.0"',
-      '  "The current version.")',
-    ];
+    const lines = ['(defconst my-version "1.0.0"', '  "The current version.")'];
     const result = await generateElispOutline(lines);
     assert.strictEqual(result.length, 1);
     assert.strictEqual(result[0].name, "my-version");
@@ -143,13 +135,13 @@ describe("generateElispOutline — examples", () => {
       "(defun my-reload-config ()",
       '  "Reload configuration."',
       "  (interactive)",
-      '  (load-file user-init-file))',
+      "  (load-file user-init-file))",
       "",
       "(defvar my--cache (make-hash-table :test 'equal))",
       "",
       "(define-minor-mode my-writing-mode",
       '  "A mode for focused writing."',
-      "  :lighter \" Write\"",
+      '  :lighter " Write"',
       "  (if my-writing-mode",
       "      (progn",
       "        (setq-local line-spacing 0.5)",

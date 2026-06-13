@@ -1,7 +1,8 @@
 # Hypotheses
 
-Questions and competing hypotheses for this investigation.
-Add observations as questions (Phase 2), then expand to hypotheses (Phase 3), then record test results (Phase 4).
+Questions and competing hypotheses for this investigation. Add observations as
+questions (Phase 2), then expand to hypotheses (Phase 3), then record test
+results (Phase 4).
 
 ---
 

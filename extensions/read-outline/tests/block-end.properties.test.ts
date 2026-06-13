@@ -1,7 +1,12 @@
 import { describe, it } from "node:test";
 import fc from "fast-check";
 import assert from "node:assert/strict";
-import { findBlockEnd, findStatementEnd, findPythonBlockEnd, findRubyBlockEnd } from "../src/block-end.ts";
+import {
+  findBlockEnd,
+  findStatementEnd,
+  findPythonBlockEnd,
+  findRubyBlockEnd,
+} from "../src/block-end.ts";
 
 // Arbitrary: generate arrays of lines containing braces
 const braceLineArb = fc.array(
@@ -53,8 +58,14 @@ describe("findBlockEnd — property: always returns index within bounds", () => 
       fc.property(braceLineArb, (lines) => {
         const startIdx = 0;
         const result = findBlockEnd(lines, startIdx);
-        assert.ok(result >= startIdx, `result ${result} < startIdx ${startIdx}`);
-        assert.ok(result <= lines.length - 1, `result ${result} > last index ${lines.length - 1}`);
+        assert.ok(
+          result >= startIdx,
+          `result ${result} < startIdx ${startIdx}`,
+        );
+        assert.ok(
+          result <= lines.length - 1,
+          `result ${result} > last index ${lines.length - 1}`,
+        );
       }),
       { numRuns: 200 },
     );
@@ -64,12 +75,21 @@ describe("findBlockEnd — property: always returns index within bounds", () => 
     fc.assert(
       fc.property(
         braceLineArb.chain((lines) =>
-          fc.tuple(fc.constant(lines), fc.integer({ min: 0, max: lines.length - 1 }))
+          fc.tuple(
+            fc.constant(lines),
+            fc.integer({ min: 0, max: lines.length - 1 }),
+          ),
         ),
         ([lines, startIdx]) => {
           const result = findBlockEnd(lines, startIdx);
-          assert.ok(result >= startIdx, `result ${result} < startIdx ${startIdx}`);
-          assert.ok(result <= lines.length - 1, `result ${result} > last index ${lines.length - 1}`);
+          assert.ok(
+            result >= startIdx,
+            `result ${result} < startIdx ${startIdx}`,
+          );
+          assert.ok(
+            result <= lines.length - 1,
+            `result ${result} > last index ${lines.length - 1}`,
+          );
         },
       ),
       { numRuns: 200 },
@@ -83,7 +103,10 @@ describe("findStatementEnd — property: always returns index within bounds", ()
       fc.property(braceLineArb, (lines) => {
         const result = findStatementEnd(lines, 0);
         assert.ok(result >= 0, `result ${result} < 0`);
-        assert.ok(result <= lines.length - 1, `result ${result} > last index ${lines.length - 1}`);
+        assert.ok(
+          result <= lines.length - 1,
+          `result ${result} > last index ${lines.length - 1}`,
+        );
       }),
       { numRuns: 200 },
     );
@@ -95,12 +118,21 @@ describe("findPythonBlockEnd — property: always returns index within bounds", 
     fc.assert(
       fc.property(
         pythonLineArb.chain((lines) =>
-          fc.tuple(fc.constant(lines), fc.integer({ min: 0, max: lines.length - 1 }))
+          fc.tuple(
+            fc.constant(lines),
+            fc.integer({ min: 0, max: lines.length - 1 }),
+          ),
         ),
         ([lines, startIdx]) => {
           const result = findPythonBlockEnd(lines, startIdx);
-          assert.ok(result >= startIdx, `result ${result} < startIdx ${startIdx}`);
-          assert.ok(result <= lines.length - 1, `result ${result} > last index ${lines.length - 1}`);
+          assert.ok(
+            result >= startIdx,
+            `result ${result} < startIdx ${startIdx}`,
+          );
+          assert.ok(
+            result <= lines.length - 1,
+            `result ${result} > last index ${lines.length - 1}`,
+          );
         },
       ),
       { numRuns: 200 },
@@ -113,12 +145,21 @@ describe("findRubyBlockEnd — property: always returns index within bounds", ()
     fc.assert(
       fc.property(
         rubyLineArb.chain((lines) =>
-          fc.tuple(fc.constant(lines), fc.integer({ min: 0, max: lines.length - 1 }))
+          fc.tuple(
+            fc.constant(lines),
+            fc.integer({ min: 0, max: lines.length - 1 }),
+          ),
         ),
         ([lines, startIdx]) => {
           const result = findRubyBlockEnd(lines, startIdx);
-          assert.ok(result >= startIdx, `result ${result} < startIdx ${startIdx}`);
-          assert.ok(result <= lines.length - 1, `result ${result} > last index ${lines.length - 1}`);
+          assert.ok(
+            result >= startIdx,
+            `result ${result} < startIdx ${startIdx}`,
+          );
+          assert.ok(
+            result <= lines.length - 1,
+            `result ${result} > last index ${lines.length - 1}`,
+          );
         },
       ),
       { numRuns: 200 },

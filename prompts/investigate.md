@@ -5,12 +5,16 @@ argument-hint: "<question> [data/source constraints]"
 
 Investigate: `$1`. Constraints/data sources: `${@:2}`.
 
-Use a scientific, evidence-driven workflow. If this investigation needs a durable workspace, suggest or use the `analysis-workflow-init` skill before going deep.
+Use a scientific, evidence-driven workflow. If this investigation needs a
+durable workspace, suggest or use the `analysis-workflow-init` skill before
+going deep.
 
 Repository/project adaptation:
 
-- Load local guidance if present: `AGENTS.md`, `.pi/SYSTEM.md`, `README.md`, data dictionaries, runbooks, dashboards/docs referenced by the project.
-- For proprietary/private data, default to aggregate metrics only; do not echo sensitive rows, file bodies, or long snippets unless I explicitly approve.
+- Load local guidance if present: `AGENTS.md`, `.pi/SYSTEM.md`, `README.md`,
+  data dictionaries, runbooks, dashboards/docs referenced by the project.
+- For proprietary/private data, default to aggregate metrics only; do not echo
+  sensitive rows, file bodies, or long snippets unless I explicitly approve.
 
 Investigation rules:
 
@@ -62,4 +66,5 @@ Confidence: high/medium/low
 ## Next steps
 ```
 
-If a workspace is created, keep `hypotheses.md`, `verified-facts.md`, `unsupported-facts.md`, `open-questions.md`, `notes.md`, and `TODO.md` current.
+If a workspace is created, keep `hypotheses.md`, `verified-facts.md`,
+`unsupported-facts.md`, `open-questions.md`, `notes.md`, and `TODO.md` current.

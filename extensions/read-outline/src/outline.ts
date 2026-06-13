@@ -13,7 +13,10 @@ import { generateHtmlOutline } from "./languages/html.ts";
 import { generateElispOutline } from "./languages/elisp.ts";
 import { generateGenericOutline } from "./languages/generic.ts";
 
-export async function generateOutline(lines: string[], filePath: string): Promise<OutlineEntry[]> {
+export async function generateOutline(
+  lines: string[],
+  filePath: string,
+): Promise<OutlineEntry[]> {
   const lang = detectLanguage(filePath);
 
   switch (lang) {

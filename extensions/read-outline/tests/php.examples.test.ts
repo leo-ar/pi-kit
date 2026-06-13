@@ -37,13 +37,13 @@ describe("generatePhpOutline — examples", () => {
     const result = await generatePhpOutline(lines);
     // class + 2 methods
     assert.ok(result.length >= 1);
-    const cls = result.find(e => e.kind === "class");
+    const cls = result.find((e) => e.kind === "class");
     assert.ok(cls);
     assert.equal(cls!.name, "UserController");
     assert.equal(cls!.startLine, 3);
     assert.equal(cls!.endLine, 11);
 
-    const methods = result.filter(e => e.kind === "fn");
+    const methods = result.filter((e) => e.kind === "fn");
     assert.equal(methods.length, 2);
     assert.equal(methods[0].name, "index");
     assert.equal(methods[0].exported, true);
@@ -60,7 +60,7 @@ describe("generatePhpOutline — examples", () => {
       "}",
     ];
     const result = await generatePhpOutline(lines);
-    const iface = result.find(e => e.kind === "interface");
+    const iface = result.find((e) => e.kind === "interface");
     assert.ok(iface);
     assert.equal(iface!.name, "Renderable");
   });
@@ -71,12 +71,12 @@ describe("generatePhpOutline — examples", () => {
       "",
       "trait HasTimestamps {",
       "    public function getCreatedAt(): DateTime {",
-      '        return $this->createdAt;',
+      "        return $this->createdAt;",
       "    }",
       "}",
     ];
     const result = await generatePhpOutline(lines);
-    const trait = result.find(e => e.kind === "trait");
+    const trait = result.find((e) => e.kind === "trait");
     assert.ok(trait);
     assert.equal(trait!.name, "HasTimestamps");
   });
@@ -91,7 +91,7 @@ describe("generatePhpOutline — examples", () => {
       "}",
     ];
     const result = await generatePhpOutline(lines);
-    const ns = result.find(e => e.kind === "namespace");
+    const ns = result.find((e) => e.kind === "namespace");
     assert.ok(ns);
     assert.equal(ns!.name, "App\\Http\\Controllers");
   });
@@ -106,7 +106,7 @@ describe("generatePhpOutline — examples", () => {
       "}",
     ];
     const result = await generatePhpOutline(lines);
-    const en = result.find(e => e.kind === "enum");
+    const en = result.find((e) => e.kind === "enum");
     assert.ok(en);
     assert.equal(en!.name, "Status");
   });
@@ -134,7 +134,7 @@ describe("generatePhpOutline — examples", () => {
       "}",
     ];
     const result = await generatePhpOutline(lines);
-    const cls = result.find(e => e.kind === "class");
+    const cls = result.find((e) => e.kind === "class");
     assert.ok(cls);
     assert.equal(cls!.name, "BaseModel");
   });
@@ -148,11 +148,11 @@ describe("generatePhpOutline — examples", () => {
       "}",
     ];
     const result = await generatePhpOutline(lines);
-    const cls = result.find(e => e.kind === "class");
+    const cls = result.find((e) => e.kind === "class");
     assert.ok(cls);
     assert.equal(cls!.name, "Config");
 
-    const consts = result.filter(e => e.kind === "const");
+    const consts = result.filter((e) => e.kind === "const");
     assert.equal(consts.length, 1);
     assert.equal(consts[0].name, "DB_HOST");
   });

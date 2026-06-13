@@ -6,8 +6,13 @@ export function findBlockEnd(lines: string[], startIdx: number): number {
   for (let i = startIdx; i < lines.length; i++) {
     const line = lines[i];
     for (const ch of line) {
-      if (ch === "{") { depth++; foundOpen = true; }
-      if (ch === "}") { depth--; }
+      if (ch === "{") {
+        depth++;
+        foundOpen = true;
+      }
+      if (ch === "}") {
+        depth--;
+      }
       if (foundOpen && depth === 0) return i;
     }
   }
@@ -35,7 +40,11 @@ export function findStatementEnd(lines: string[], startIdx: number): number {
     // Statement ends when we're back to zero depth and line doesn't end with comma/operator
     if (i > startIdx && depth === 0 && parenDepth === 0) {
       const trimmed = line.trim();
-      if (!trimmed.endsWith(",") && !trimmed.endsWith("(") && !trimmed.endsWith("{")) {
+      if (
+        !trimmed.endsWith(",") &&
+        !trimmed.endsWith("(") &&
+        !trimmed.endsWith("{")
+      ) {
         return i;
       }
     }
@@ -45,7 +54,8 @@ export function findStatementEnd(lines: string[], startIdx: number): number {
 
 /** Find end of a Python block (indentation-based) */
 export function findPythonBlockEnd(lines: string[], startIdx: number): number {
-  const startIndent = lines[startIdx].length - lines[startIdx].trimStart().length;
+  const startIndent =
+    lines[startIdx].length - lines[startIdx].trimStart().length;
 
   for (let i = startIdx + 1; i < lines.length; i++) {
     const line = lines[i];
@@ -59,14 +69,20 @@ export function findPythonBlockEnd(lines: string[], startIdx: number): number {
 
 /** Find end of a Ruby block (end keyword based) */
 export function findRubyBlockEnd(lines: string[], startIdx: number): number {
-  const startIndent = lines[startIdx].length - lines[startIdx].trimStart().length;
+  const startIndent =
+    lines[startIdx].length - lines[startIdx].trimStart().length;
   let depth = 1;
 
   for (let i = startIdx + 1; i < lines.length; i++) {
     const trimmed = lines[i].trimStart();
     const indent = lines[i].length - trimmed.length;
 
-    if (/^(class|module|def|do|if|unless|case|begin|while|until|for)\b/.test(trimmed) && indent >= startIndent) {
+    if (
+      /^(class|module|def|do|if|unless|case|begin|while|until|for)\b/.test(
+        trimmed,
+      ) &&
+      indent >= startIndent
+    ) {
       depth++;
     }
     if (trimmed === "end" || trimmed.startsWith("end ")) {

@@ -15,7 +15,10 @@ import type { Message } from "./extraction.ts";
 
 type Script = Array<[Partial<CompactEffect>, unknown]>;
 
-function matchesSubset(obj: Record<string, unknown>, subset: Record<string, unknown>): void {
+function matchesSubset(
+  obj: Record<string, unknown>,
+  subset: Record<string, unknown>,
+): void {
   for (const [key, value] of Object.entries(subset)) {
     assert.deepStrictEqual(
       (obj as any)[key],
@@ -25,19 +28,26 @@ function matchesSubset(obj: Record<string, unknown>, subset: Record<string, unkn
   }
 }
 
-function runScript(gen: Generator<CompactEffect, any, any>, script: Script): any {
+function runScript(
+  gen: Generator<CompactEffect, any, any>,
+  script: Script,
+): any {
   let i = 0;
   let result = gen.next();
   while (!result.done) {
     if (i >= script.length) {
-      throw new Error(`Generator yielded more effects than script provides (${script.length} entries). Extra effect: ${JSON.stringify(result.value)}`);
+      throw new Error(
+        `Generator yielded more effects than script provides (${script.length} entries). Extra effect: ${JSON.stringify(result.value)}`,
+      );
     }
     const [expectedEffect, response] = script[i++];
     matchesSubset(result.value as any, expectedEffect as any);
     result = gen.next(response);
   }
   if (i < script.length) {
-    throw new Error(`Generator finished early — ${script.length - i} unused script entries`);
+    throw new Error(
+      `Generator finished early — ${script.length - i} unused script entries`,
+    );
   }
   return result.value;
 }
@@ -47,7 +57,12 @@ function runScript(gen: Generator<CompactEffect, any, any>, script: Script): any
 const fakeModel = { id: "test-model", contextWindow: 128000 };
 
 const basicMessages: Message[] = [
-  { role: "user", content: [{ type: "text", text: "Refactor the auth module to use JWT tokens" }] },
+  {
+    role: "user",
+    content: [
+      { type: "text", text: "Refactor the auth module to use JWT tokens" },
+    ],
+  },
   {
     role: "assistant",
     content: [
@@ -105,7 +120,8 @@ describe("compactPipeline — script runner", () => {
   });
 
   it("successful compaction returns summary with file tags", () => {
-    const llmSummary = "## Goal\nRefactor auth to JWT\n\n## Progress\n- [x] Updated src/auth.ts";
+    const llmSummary =
+      "## Goal\nRefactor auth to JWT\n\n## Progress\n- [x] Updated src/auth.ts";
 
     const result = runScript(compactPipeline(basicInput), [
       [{ tag: "get_model" }, fakeModel],
@@ -137,7 +153,11 @@ describe("compactPipeline — script runner", () => {
 
     assert(result !== undefined);
     // File tags are always appended (this is how pi tracks files)
-    assert(result.summary.includes("<modified-files>\nsrc/auth.ts\n</modified-files>"));
+    assert(
+      result.summary.includes(
+        "<modified-files>\nsrc/auth.ts\n</modified-files>",
+      ),
+    );
   });
 
   it("caps conversation text when maxConversationChars is set", () => {
@@ -159,8 +179,14 @@ describe("compactPipeline — script runner", () => {
     step = gen.next(undefined); // llm_complete
     // Inspect the prompt in the llm_complete effect
     capturedPrompt = (step.value as any).prompt;
-    assert(!capturedPrompt.includes("x".repeat(200)), "Should have been capped");
-    assert(capturedPrompt.includes("x".repeat(50)), "Should contain capped text");
+    assert(
+      !capturedPrompt.includes("x".repeat(200)),
+      "Should have been capped",
+    );
+    assert(
+      capturedPrompt.includes("x".repeat(50)),
+      "Should contain capped text",
+    );
   });
 
   it("includes previousSummary in prompt when provided", () => {
@@ -192,7 +218,8 @@ describe("compactPipeline — script runner", () => {
     };
 
     // LLM summary mentions the precomputed files
-    const llmSummary = "## Goal\nBuild output\n\nModified dist/output.js and src/main.ts";
+    const llmSummary =
+      "## Goal\nBuild output\n\nModified dist/output.js and src/main.ts";
 
     const result = runScript(compactPipeline(input), [
       [{ tag: "get_model" }, fakeModel],
@@ -215,14 +242,27 @@ describe("compactPipeline — script runner", () => {
 
   it("adds in-progress turn section when isSplitTurn with turnPrefixMessages", () => {
     const turnMessages: Message[] = [
-      { role: "user", content: [{ type: "text", text: "Now let's add error handling to the parser" }] },
+      {
+        role: "user",
+        content: [
+          { type: "text", text: "Now let's add error handling to the parser" },
+        ],
+      },
       {
         role: "assistant",
         content: [
-          { type: "toolCall", name: "edit", arguments: { path: "src/parser.ts" } },
+          {
+            type: "toolCall",
+            name: "edit",
+            arguments: { path: "src/parser.ts" },
+          },
         ],
       },
-      { role: "toolResult", isError: true, content: [{ type: "text", text: "SyntaxError: unexpected token" }] },
+      {
+        role: "toolResult",
+        isError: true,
+        content: [{ type: "text", text: "SyntaxError: unexpected token" }],
+      },
     ];
 
     const input: PipelineInput = {
@@ -231,7 +271,8 @@ describe("compactPipeline — script runner", () => {
       turnPrefixMessages: turnMessages,
     };
 
-    const llmSummary = "## Goal\nRefactor auth\n\n## Progress\n- [x] Updated src/auth.ts";
+    const llmSummary =
+      "## Goal\nRefactor auth\n\n## Progress\n- [x] Updated src/auth.ts";
 
     const result = runScript(compactPipeline(input), [
       [{ tag: "get_model" }, fakeModel],
@@ -253,7 +294,8 @@ describe("compactPipeline — script runner", () => {
       isSplitTurn: false,
     };
 
-    const llmSummary = "## Goal\nRefactor auth\n\n## Progress\n- [x] Updated src/auth.ts";
+    const llmSummary =
+      "## Goal\nRefactor auth\n\n## Progress\n- [x] Updated src/auth.ts";
 
     const result = runScript(compactPipeline(input), [
       [{ tag: "get_model" }, fakeModel],

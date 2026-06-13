@@ -1,6 +1,11 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { findBlockEnd, findStatementEnd, findPythonBlockEnd, findRubyBlockEnd } from "../src/block-end.ts";
+import {
+  findBlockEnd,
+  findStatementEnd,
+  findPythonBlockEnd,
+  findRubyBlockEnd,
+} from "../src/block-end.ts";
 
 describe("findBlockEnd", () => {
   it("finds closing brace on same line", () => {
@@ -9,11 +14,7 @@ describe("findBlockEnd", () => {
   });
 
   it("finds closing brace on next line", () => {
-    const lines = [
-      "function x() {",
-      "  return 1;",
-      "}",
-    ];
+    const lines = ["function x() {", "  return 1;", "}"];
     assert.equal(findBlockEnd(lines, 0), 2);
   });
 
@@ -34,10 +35,7 @@ describe("findBlockEnd", () => {
   });
 
   it("returns end of file for unclosed braces", () => {
-    const lines = [
-      "function x() {",
-      "  return 1;",
-    ];
+    const lines = ["function x() {", "  return 1;"];
     assert.equal(findBlockEnd(lines, 0), 1);
   });
 
@@ -62,22 +60,12 @@ describe("findStatementEnd", () => {
   });
 
   it("finds end of multi-line object", () => {
-    const lines = [
-      "const x = {",
-      "  a: 1,",
-      "  b: 2,",
-      "};",
-    ];
+    const lines = ["const x = {", "  a: 1,", "  b: 2,", "};"];
     assert.equal(findStatementEnd(lines, 0), 3);
   });
 
   it("finds end of multi-line function call", () => {
-    const lines = [
-      "const x = foo(",
-      "  1,",
-      "  2,",
-      ");",
-    ];
+    const lines = ["const x = foo(", "  1,", "  2,", ");"];
     assert.equal(findStatementEnd(lines, 0), 3);
   });
 
@@ -89,12 +77,7 @@ describe("findStatementEnd", () => {
 
 describe("findPythonBlockEnd", () => {
   it("finds end by dedent", () => {
-    const lines = [
-      "def foo():",
-      "    return 1",
-      "",
-      "def bar():",
-    ];
+    const lines = ["def foo():", "    return 1", "", "def bar():"];
     // Blank line is skipped; next non-blank is "def bar():" at indent 0 → returns i-1 = 2
     assert.equal(findPythonBlockEnd(lines, 0), 2);
   });
@@ -114,11 +97,7 @@ describe("findPythonBlockEnd", () => {
   });
 
   it("returns last line for block at end of file", () => {
-    const lines = [
-      "def foo():",
-      "    return 1",
-      "    return 2",
-    ];
+    const lines = ["def foo():", "    return 1", "    return 2"];
     assert.equal(findPythonBlockEnd(lines, 0), 2);
   });
 
@@ -136,41 +115,22 @@ describe("findPythonBlockEnd", () => {
 
 describe("findRubyBlockEnd", () => {
   it("finds matching end keyword", () => {
-    const lines = [
-      "def foo",
-      "  puts 'hi'",
-      "end",
-    ];
+    const lines = ["def foo", "  puts 'hi'", "end"];
     assert.equal(findRubyBlockEnd(lines, 0), 2);
   });
 
   it("handles nested blocks", () => {
-    const lines = [
-      "def foo",
-      "  if true",
-      "    puts 'hi'",
-      "  end",
-      "end",
-    ];
+    const lines = ["def foo", "  if true", "    puts 'hi'", "  end", "end"];
     assert.equal(findRubyBlockEnd(lines, 0), 4);
   });
 
   it("returns end of file when no matching end", () => {
-    const lines = [
-      "def foo",
-      "  puts 'hi'",
-    ];
+    const lines = ["def foo", "  puts 'hi'"];
     assert.equal(findRubyBlockEnd(lines, 0), 1);
   });
 
   it("finds class end", () => {
-    const lines = [
-      "class Foo",
-      "  def bar",
-      "    1",
-      "  end",
-      "end",
-    ];
+    const lines = ["class Foo", "  def bar", "    1", "  end", "end"];
     assert.equal(findRubyBlockEnd(lines, 0), 4);
   });
 });

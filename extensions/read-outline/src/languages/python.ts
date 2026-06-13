@@ -14,7 +14,13 @@ export function generatePythonOutline(lines: string[]): OutlineEntry[] {
     if (classMatch && indent === 0) {
       const name = classMatch[1];
       const endLine = findPythonBlockEnd(lines, i);
-      entries.push({ kind: "class", name, startLine: i + 1, endLine: endLine + 1, exported: true });
+      entries.push({
+        kind: "class",
+        name,
+        startLine: i + 1,
+        endLine: endLine + 1,
+        exported: true,
+      });
       continue;
     }
 
@@ -24,14 +30,26 @@ export function generatePythonOutline(lines: string[]): OutlineEntry[] {
       const name = fnMatch[2];
       const endLine = findPythonBlockEnd(lines, i);
       const exported = !name.startsWith("_");
-      entries.push({ kind: "fn", name, startLine: i + 1, endLine: endLine + 1, exported });
+      entries.push({
+        kind: "fn",
+        name,
+        startLine: i + 1,
+        endLine: endLine + 1,
+        exported,
+      });
       continue;
     }
 
     // Top-level assignments (constants)
     const constMatch = trimmed.match(/^([A-Z][A-Z_0-9]+)\s*=/);
     if (constMatch && indent === 0) {
-      entries.push({ kind: "const", name: constMatch[1], startLine: i + 1, endLine: i + 1, exported: true });
+      entries.push({
+        kind: "const",
+        name: constMatch[1],
+        startLine: i + 1,
+        endLine: i + 1,
+        exported: true,
+      });
     }
   }
 

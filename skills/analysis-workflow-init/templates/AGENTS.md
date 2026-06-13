@@ -8,7 +8,8 @@ Rules for conducting data investigations in this directory.
 
 ### Phase 1: Observe
 
-- Profile the data source: what writes to it, what's filtered, what's known noise.
+- Profile the data source: what writes to it, what's filtered, what's known
+  noise.
 - Run exploratory queries. Note patterns without interpreting them.
 - Record raw observations in `notes.md` (scratchpad, not a deliverable).
 - **Do NOT form conclusions in this phase.** Only state what you see.
@@ -29,6 +30,7 @@ Rules for conducting data investigations in this directory.
   - **Confirmation test:** what evidence would support this?
   - **Falsification test:** what evidence would disprove this?
 - Example:
+
   ```
   Observation: Weekly views jumped 5× starting Apr 13.
 
@@ -44,16 +46,20 @@ Rules for conducting data investigations in this directory.
     Confirm: Views match known service UAs or IPs.
     Falsify: No known service UA/IP accounts for the increase.
   ```
-- **Never test only the confirmation side.** Always run the falsification test too.
+
+- **Never test only the confirmation side.** Always run the falsification test
+  too.
 
 ### Phase 4: Test
 
 - Run queries that test each hypothesis — both confirmation and falsification.
 - Record results in `hypotheses.md` next to each hypothesis.
 - Accept one of three outcomes for each hypothesis:
-  - **Confirmed** — confirmation test passed AND falsification test failed to disprove
+  - **Confirmed** — confirmation test passed AND falsification test failed to
+    disprove
   - **Refuted** — falsification test succeeded in disproving
-  - **Inconclusive** — neither test was decisive; note what additional data would resolve it
+  - **Inconclusive** — neither test was decisive; note what additional data
+    would resolve it
 - **"Inconclusive" is a valid and respectable outcome.** It is always preferable
   to a premature wrong conclusion.
 
@@ -72,7 +78,8 @@ Rules for conducting data investigations in this directory.
 
 - Reports reference only facts from `verified-facts.md`.
 - Inconclusive items may appear in reports but must be labeled as such.
-- If a number isn't verified, use "TBD" or "unverified" — never state it as fact.
+- If a number isn't verified, use "TBD" or "unverified" — never state it as
+  fact.
 - Write reports only after the hypothesis cycle is complete.
 
 ### Phase 7: Review
@@ -90,15 +97,16 @@ Before any number goes into a report, confirm:
 
 - [ ] **Date ranges match** — numerator and denominator use the same window
 - [ ] **Filters are consistent** — same exclusions in both "before" and "after"
-- [ ] **Classifications are grounded** — confirmed via multiple independent signals,
-      not a single data point
+- [ ] **Classifications are grounded** — confirmed via multiple independent
+      signals, not a single data point
 - [ ] **Cross-referenced** — at least one independent signal supports the claim
 - [ ] **Percentages sum** — all categories add to ~100%, no double-counting
 - [ ] **Labels are precise** — "confirmed" vs. "suspicious" vs. "inconclusive"
-- [ ] **Alternative explanations considered** — at least one competing hypothesis
-      was tested and refuted before concluding
-- [ ] **Multiple data sources checked** — the query tool tells you *what* changed;
-      code/config tells you *why*; logs/history tells you *when and who*
+- [ ] **Alternative explanations considered** — at least one competing
+      hypothesis was tested and refuted before concluding
+- [ ] **Multiple data sources checked** — the query tool tells you _what_
+      changed; code/config tells you _why_; logs/history tells you _when and
+      who_
 
 ---
 
@@ -107,8 +115,9 @@ Before any number goes into a report, confirm:
 1. **Immutable without query access.** Only sessions that can successfully run
    queries against the data source may add, modify, or remove entries in
    `verified-facts.md`.
-2. **Reports defer to verified-facts.** If a report contradicts `verified-facts.md`,
-   the report is wrong — fix the report, not the facts file.
+2. **Reports defer to verified-facts.** If a report contradicts
+   `verified-facts.md`, the report is wrong — fix the report, not the facts
+   file.
 3. **Unsupported claims go to `unsupported-facts.md`.** If a session finds a
    specific number or claim in a report that has no corresponding entry in
    `verified-facts.md`, it must:
@@ -117,24 +126,25 @@ Before any number goes into a report, confirm:
    - NOT assume the claim is correct or incorrect
 4. **Query sessions resolve `unsupported-facts.md`.** On each session start with
    data access, check `unsupported-facts.md`. For each entry, run the query:
-   - If confirmed → add to `verified-facts.md`, remove from `unsupported-facts.md`
+   - If confirmed → add to `verified-facts.md`, remove from
+     `unsupported-facts.md`
    - If refuted → fix the report, remove from `unsupported-facts.md`
 
 ---
 
 ## Naming Conventions
 
-| File | Purpose |
-|---|---|
-| `AGENTS.md` | This file — workflow rules |
-| `hypotheses.md` | Questions, competing hypotheses, confirmation/falsification tests, results |
-| `verified-facts.md` | Single source of truth for confirmed numbers (immutable without data access) |
-| `unsupported-facts.md` | Claims in reports lacking verified-facts backing — awaiting confirmation |
-| `open-questions.md` | Inconclusive items — what additional data would resolve them |
-| `notes.md` | Scratchpad during observation (not a deliverable) |
-| `TODO.md` | Open investigation threads |
-| `README.md` | Executive summary (written last, references verified-facts) |
-| `*.md` (other) | Standalone investigation reports |
+| File                   | Purpose                                                                      |
+| ---------------------- | ---------------------------------------------------------------------------- |
+| `AGENTS.md`            | This file — workflow rules                                                   |
+| `hypotheses.md`        | Questions, competing hypotheses, confirmation/falsification tests, results   |
+| `verified-facts.md`    | Single source of truth for confirmed numbers (immutable without data access) |
+| `unsupported-facts.md` | Claims in reports lacking verified-facts backing — awaiting confirmation     |
+| `open-questions.md`    | Inconclusive items — what additional data would resolve them                 |
+| `notes.md`             | Scratchpad during observation (not a deliverable)                            |
+| `TODO.md`              | Open investigation threads                                                   |
+| `README.md`            | Executive summary (written last, references verified-facts)                  |
+| `*.md` (other)         | Standalone investigation reports                                             |
 
 ---
 
@@ -152,7 +162,7 @@ Before any number goes into a report, confirm:
    re-verify it. Context summaries can contain stale or incorrect claims.
 6. **Mixing date ranges** — especially when comparing periods. Define windows
    explicitly and verify both sides use the same window.
-7. **Single-source causation** — the data tells you *what* changed, not *why*.
+7. **Single-source causation** — the data tells you _what_ changed, not _why_.
    Always check code, config, and history before claiming a cause.
 8. **Treating "unexplained" as "suspicious"** — dark social, email clicks,
    bookmarks, and direct/unattributed sources are all legitimate.
@@ -170,7 +180,8 @@ When resuming this investigation in a new session:
 
 1. Read `AGENTS.md` (this file) first
 2. Confirm data access — determines what you can do this session
-3. If data access available: read `unsupported-facts.md` and resolve pending items
+3. If data access available: read `unsupported-facts.md` and resolve pending
+   items
 4. Read `verified-facts.md` for grounded numbers
 5. Read `open-questions.md` for inconclusive threads
 6. Read `hypotheses.md` for investigation state
@@ -187,4 +198,5 @@ When beginning a new investigation on the same data:
 1. Read `AGENTS.md` (this file) only
 2. Profile the data source (Phase 1: Observe) before anything else
 3. Do NOT read prior reports or conclusions — they may bias your hypotheses
-4. Follow the phases in order: Observe → Question → Hypothesize → Test → Verify → Write → Review
+4. Follow the phases in order: Observe → Question → Hypothesize → Test → Verify
+   → Write → Review

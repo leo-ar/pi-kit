@@ -13,7 +13,9 @@ choice — not to ship production code.
 
 # The Hypothesis
 
-- **Question:** <Paste your specific architectural question here, e.g., "Does extracting this state machine into a private array create refactoring brittleness?">
+- **Question:** <Paste your specific architectural question here, e.g., "Does
+  extracting this state machine into a private array create refactoring
+  brittleness?">
 - **Expected Outcome:** <What you expect to observe if the hypothesis holds>
 - **Scope Boundary:** <What is explicitly out of scope for this experiment>
 
@@ -31,6 +33,6 @@ are non-negotiable:
 3. **Never merge to `dev`.** This branch will be observed, then discarded or
    promoted to a proper `feat/` or `fix/` branch.
 
-Begin by outlining your implementation approach in 3–5 bullet points, then
-start coding. When the experiment is complete, write your observations into
-`notes/` and surface any follow-up tasks to `notes/TODO.md > Backlog > Surfaced`.
+Begin by outlining your implementation approach in 3–5 bullet points, then start
+coding. When the experiment is complete, write your observations into `notes/`
+and surface any follow-up tasks to `notes/TODO.md > Backlog > Surfaced`.

@@ -49,7 +49,8 @@ skipped by later passes.
 
 ## Design decisions
 
-- Mirrors `gptel-md2org.el` pass-for-pass — keeps parity with Emacs-native export
+- Mirrors `gptel-md2org.el` pass-for-pass — keeps parity with Emacs-native
+  export
 - Protected regions prevent passes from clobbering code block contents
 - Token accumulation is session-wide, stored at file level
 
