@@ -25,8 +25,7 @@ context copy is altered.
 | bash: grep/rg      | `[grep "pattern" — 23 matches]`                           |
 | bash: other >2KB   | `[bash: <command> — 4.2KB output, exit 0]`                |
 
-**Always kept**: recent K turns, small results (<500 chars), errors, edit/write
-confirmations.
+**Always kept**: recent K turns (fixed internal default), small results (<500 chars), errors, edit/write confirmations.
 
 ## Measured savings
 
@@ -45,12 +44,9 @@ short sessions where context pressure is already low.
 
 | Command         | Effect                        |
 | --------------- | ----------------------------- |
-| `/prune-stats`  | Show savings for this session |
-| `/prune-keep`   | Show current K level          |
-| `/prune-keep 5` | Set to K5 for this session    |
-| `/prune-config` | Show all config values        |
+| `/prune-stats`  | Show a one-line savings summary for this session |
 
-Status bar auto-updates: `🪓 340KB K9`
+Status bar auto-updates: `🪓 340KB`
 
 The saved totals restore from session-backed state for the same session tree
 (including forks when ancestry is shared) and remain isolated from unrelated

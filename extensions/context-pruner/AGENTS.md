@@ -34,11 +34,11 @@ bench.ts               Replay benchmark (read-only, measures savings)
 
 ## Design decisions
 
-- Default K9 — bench showed K5 only helps short sessions; K9 is compact in
-  status bar
-- Config is ephemeral — resets on reload, tunable via `/prune-keep`
-- Output: only `/prune-stats` writes to conversation; everything else uses
-  `ctx.ui.notify`
+- Default K9 — bench showed K5 only helps short sessions; K9 remains the fixed
+  internal pruning window
+- Config is ephemeral — resets on reload
+- Output: `/prune-stats` uses `ctx.ui.notify` for a one-line summary;
+  everything else uses `ctx.ui.notify`
 - No `ctx.ui.custom()` — unsupported in emacs frontend
 - `ctx.ui.setStatus` auto-updates from context event handler
 - Stats now persist via session-backed custom entries for the same session tree
