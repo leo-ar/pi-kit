@@ -1,0 +1,27 @@
+{
+  "name": "pi-session-bloat-guard",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Session-level bloat warnings for pi based on reads, edits, writes, and compactions",
+  "keywords": [
+    "pi-package"
+  ],
+  "license": "LGPL-3.0-or-later",
+  "files": [
+    "index.ts",
+    "core.ts",
+    "index.test.ts",
+    "core.test.ts",
+    "core.properties.test.ts",
+    "README.md",
+    "AGENTS.md"
+  ],
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}
