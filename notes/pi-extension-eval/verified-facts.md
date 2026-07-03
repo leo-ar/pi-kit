@@ -1,0 +1,21 @@
+# Verified facts
+
+- The pi session archive contains **84 sessions** in `~/.pi/agent/sessions/`.
+- `pi-kit` contributes **7** of those sessions.
+- Across the archive, the current extension stack saw:
+  - **3,793** `read` calls
+  - **1,241** full-file reads
+  - **59** visible `read-outline` outline replacements
+  - **190** compaction events
+- In `pi-kit`, the current extension stack saw:
+  - **244** `read` calls
+  - **174** full-file reads
+  - **17** visible `read-outline` outline replacements
+  - **10** compaction events
+  - **183** `edit` calls
+  - **134** `write` calls
+- A `pi-kit` session on **2026-05-25** reported `context-pruner` stats of **10 LLM calls with pruning**, **173.3 KB saved**, and **~44,357 tokens saved**.
+- Another `pi-kit` session reported `context-pruner` stats of **0** pruning calls and **0 KB** saved.
+- The archive includes multiple `pi-kit` sessions with repeated full reads of the same files and high edit/write churn.
+- `pi-kit` session **2026-05-25** had `context-pruner.ts` read **8** times and modified **22** times.
+- `pi-kit` session **2026-05-26** had **7** `read-outline` outline hits.

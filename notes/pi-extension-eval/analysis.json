@@ -1,0 +1,355 @@
+{
+  "global": {
+    "sessions": 84,
+    "byCwd": [
+      [
+        "/Users/lrojas/Projects/PagerDuty/citizens-band",
+        {
+          "sessions": 20,
+          "readCalls": 1998,
+          "fullReads": 531,
+          "outlines": 20,
+          "compactions": 107,
+          "edits": 2097,
+          "writes": 554,
+          "bash": 9144
+        }
+      ],
+      [
+        "/Users/lrojas/Projects/PagerDuty/citizens-band-nextjs",
+        {
+          "sessions": 15,
+          "readCalls": 255,
+          "fullReads": 109,
+          "outlines": 0,
+          "compactions": 10,
+          "edits": 137,
+          "writes": 99,
+          "bash": 1165
+        }
+      ],
+      [
+        "/Users/lrojas/.config/emacs",
+        {
+          "sessions": 9,
+          "readCalls": 315,
+          "fullReads": 52,
+          "outlines": 4,
+          "compactions": 5,
+          "edits": 212,
+          "writes": 25,
+          "bash": 820
+        }
+      ],
+      [
+        "/Users/lrojas/org",
+        {
+          "sessions": 9,
+          "readCalls": 66,
+          "fullReads": 14,
+          "outlines": 0,
+          "compactions": 4,
+          "edits": 51,
+          "writes": 11,
+          "bash": 106
+        }
+      ],
+      [
+        "/Users/lrojas",
+        {
+          "sessions": 8,
+          "readCalls": 91,
+          "fullReads": 31,
+          "outlines": 3,
+          "compactions": 6,
+          "edits": 32,
+          "writes": 27,
+          "bash": 683
+        }
+      ],
+      [
+        "/Users/lrojas/Projects/leo-ar/pi-kit",
+        {
+          "sessions": 7,
+          "readCalls": 244,
+          "fullReads": 174,
+          "outlines": 17,
+          "compactions": 10,
+          "edits": 183,
+          "writes": 134,
+          "bash": 934
+        }
+      ],
+      [
+        "/Users/lrojas/Projects/PagerDuty/pd-analysis",
+        {
+          "sessions": 4,
+          "readCalls": 127,
+          "fullReads": 76,
+          "outlines": 0,
+          "compactions": 17,
+          "edits": 117,
+          "writes": 116,
+          "bash": 959
+        }
+      ],
+      [
+        "/Users/lrojas/Projects/leo-ar/jml/jml-query-js",
+        {
+          "sessions": 3,
+          "readCalls": 353,
+          "fullReads": 158,
+          "outlines": 0,
+          "compactions": 26,
+          "edits": 276,
+          "writes": 62,
+          "bash": 915
+        }
+      ],
+      [
+        "/Users/lrojas/Projects/leo-ar/pi-coding-agent-history-render-perf",
+        {
+          "sessions": 2,
+          "readCalls": 42,
+          "fullReads": 8,
+          "outlines": 0,
+          "compactions": 0,
+          "edits": 34,
+          "writes": 18,
+          "bash": 106
+        }
+      ],
+      [
+        "/Users/lrojas/Projects/leo-ar/OpenSpec",
+        {
+          "sessions": 2,
+          "readCalls": 58,
+          "fullReads": 20,
+          "outlines": 9,
+          "compactions": 0,
+          "edits": 15,
+          "writes": 6,
+          "bash": 139
+        }
+      ],
+      [
+        "/Users/lrojas/Projects/leo-ar/pi-kit/extensions/export-org",
+        {
+          "sessions": 1,
+          "readCalls": 2,
+          "fullReads": 2,
+          "outlines": 0,
+          "compactions": 0,
+          "edits": 0,
+          "writes": 0,
+          "bash": 1
+        }
+      ],
+      [
+        "/Users/lrojas/Projects/leo-ar/jml",
+        {
+          "sessions": 1,
+          "readCalls": 31,
+          "fullReads": 24,
+          "outlines": 0,
+          "compactions": 4,
+          "edits": 55,
+          "writes": 13,
+          "bash": 46
+        }
+      ],
+      [
+        "/Users/lrojas/Projects/PagerDuty/code-assist",
+        {
+          "sessions": 1,
+          "readCalls": 9,
+          "fullReads": 9,
+          "outlines": 0,
+          "compactions": 0,
+          "edits": 9,
+          "writes": 3,
+          "bash": 44
+        }
+      ],
+      [
+        "/Users/lrojas/Projects/leo-ar/jml/jml-parse-js",
+        {
+          "sessions": 1,
+          "readCalls": 12,
+          "fullReads": 12,
+          "outlines": 0,
+          "compactions": 0,
+          "edits": 0,
+          "writes": 6,
+          "bash": 9
+        }
+      ],
+      [
+        "/Users/lrojas/Projects/leo-ar/pi-coding-agent",
+        {
+          "sessions": 1,
+          "readCalls": 191,
+          "fullReads": 21,
+          "outlines": 6,
+          "compactions": 1,
+          "edits": 94,
+          "writes": 18,
+          "bash": 378
+        }
+      ]
+    ]
+  },
+  "hashlineCandidates": [
+    {
+      "file": "2026-06-09T22-03-26-413Z_019eae69-714d-7ae3-b501-6f455c86c69c.jsonl",
+      "cwd": "/Users/lrojas/Projects/PagerDuty/citizens-band",
+      "readCalls": 340,
+      "fullReads": 33,
+      "compactions": 12,
+      "edits": 326,
+      "writes": 98,
+      "bash": 1138,
+      "outlineHits": 5,
+      "repeatedFullReadFiles": 6,
+      "repeatedFullReads": 6,
+      "pruneStats": null,
+      "score": 464
+    },
+    {
+      "file": "2026-06-12T14-50-53-459Z_019ebc50-8293-7065-890d-bc586cfeb0f8.jsonl",
+      "cwd": "/Users/lrojas/Projects/PagerDuty/citizens-band",
+      "readCalls": 301,
+      "fullReads": 29,
+      "compactions": 11,
+      "edits": 310,
+      "writes": 95,
+      "bash": 1107,
+      "outlineHits": 4,
+      "repeatedFullReadFiles": 6,
+      "repeatedFullReads": 6,
+      "pruneStats": null,
+      "score": 441
+    },
+    {
+      "file": "2026-06-05T14-46-37-734Z_019e9840-17a6-786e-bc74-09aaa9f519fc.jsonl",
+      "cwd": "/Users/lrojas/Projects/PagerDuty/citizens-band",
+      "readCalls": 301,
+      "fullReads": 29,
+      "compactions": 11,
+      "edits": 309,
+      "writes": 95,
+      "bash": 1088,
+      "outlineHits": 4,
+      "repeatedFullReadFiles": 6,
+      "repeatedFullReads": 6,
+      "pruneStats": null,
+      "score": 440
+    },
+    {
+      "file": "2026-05-29T15-18-07-560Z_019e7450-69c8-7f9d-867f-8d3be76e438c.jsonl",
+      "cwd": "/Users/lrojas/Projects/PagerDuty/citizens-band",
+      "readCalls": 235,
+      "fullReads": 33,
+      "compactions": 9,
+      "edits": 267,
+      "writes": 80,
+      "bash": 855,
+      "outlineHits": 4,
+      "repeatedFullReadFiles": 7,
+      "repeatedFullReads": 7,
+      "pruneStats": null,
+      "score": 377
+    },
+    {
+      "file": "2026-05-13T17-42-42-919Z_019e226f-09e5-743c-9618-511deedfff9a.jsonl",
+      "cwd": "/Users/lrojas/Projects/PagerDuty/citizens-band",
+      "readCalls": 134,
+      "fullReads": 89,
+      "compactions": 11,
+      "edits": 184,
+      "writes": 46,
+      "bash": 982,
+      "outlineHits": 0,
+      "repeatedFullReadFiles": 19,
+      "repeatedFullReads": 53,
+      "pruneStats": null,
+      "score": 296
+    },
+    {
+      "file": "2026-05-15T15-14-22-375Z_019e2c33-f226-721e-8c47-49676529e822.jsonl",
+      "cwd": "/Users/lrojas/Projects/PagerDuty/citizens-band",
+      "readCalls": 108,
+      "fullReads": 68,
+      "compactions": 11,
+      "edits": 183,
+      "writes": 23,
+      "bash": 831,
+      "outlineHits": 0,
+      "repeatedFullReadFiles": 15,
+      "repeatedFullReads": 35,
+      "pruneStats": null,
+      "score": 251
+    },
+    {
+      "file": "2026-05-18T13-22-48-960Z_019e3b40-e400-7ec8-a553-0106b278ee67.jsonl",
+      "cwd": "/Users/lrojas/Projects/leo-ar/jml/jml-query-js",
+      "readCalls": 170,
+      "fullReads": 77,
+      "compactions": 13,
+      "edits": 146,
+      "writes": 37,
+      "bash": 487,
+      "outlineHits": 0,
+      "repeatedFullReadFiles": 15,
+      "repeatedFullReads": 42,
+      "pruneStats": null,
+      "score": 242
+    },
+    {
+      "file": "2026-05-26T14-02-49-994Z_019e6498-670a-7b38-8f86-c50d098ea920.jsonl",
+      "cwd": "/Users/lrojas/Projects/leo-ar/pi-kit",
+      "readCalls": 69,
+      "fullReads": 44,
+      "compactions": 5,
+      "edits": 84,
+      "writes": 62,
+      "bash": 328,
+      "outlineHits": 7,
+      "repeatedFullReadFiles": 11,
+      "repeatedFullReads": 14,
+      "pruneStats": null,
+      "score": 166
+    },
+    {
+      "file": "2026-05-20T01-51-39-496Z_019e4314-d5e8-7465-b7ad-d280137b51e3.jsonl",
+      "cwd": "/Users/lrojas/Projects/PagerDuty/citizens-band",
+      "readCalls": 51,
+      "fullReads": 22,
+      "compactions": 11,
+      "edits": 104,
+      "writes": 30,
+      "bash": 530,
+      "outlineHits": 0,
+      "repeatedFullReadFiles": 4,
+      "repeatedFullReads": 9,
+      "pruneStats": null,
+      "score": 148
+    },
+    {
+      "file": "2026-05-17T23-37-16-560Z_019e384d-1610-7727-8dc7-d48cf9a17d64.jsonl",
+      "cwd": "/Users/lrojas/Projects/leo-ar/jml/jml-query-js",
+      "readCalls": 130,
+      "fullReads": 64,
+      "compactions": 10,
+      "edits": 83,
+      "writes": 15,
+      "bash": 284,
+      "outlineHits": 0,
+      "repeatedFullReadFiles": 13,
+      "repeatedFullReads": 35,
+      "pruneStats": null,
+      "score": 146
+    }
+  ],
+  "pruneSummaries": []
+}
