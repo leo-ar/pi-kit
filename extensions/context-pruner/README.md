@@ -52,6 +52,10 @@ short sessions where context pressure is already low.
 
 Status bar auto-updates: `🪓 340KB K9`
 
+The saved totals restore from session-backed state for the same session tree
+(including forks when ancestry is shared) and remain isolated from unrelated
+sessions.
+
 ## Install
 
 ```bash

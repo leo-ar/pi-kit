@@ -41,6 +41,8 @@ bench.ts               Replay benchmark (read-only, measures savings)
   `ctx.ui.notify`
 - No `ctx.ui.custom()` — unsupported in emacs frontend
 - `ctx.ui.setStatus` auto-updates from context event handler
+- Stats now persist via session-backed custom entries for the same session tree
+  (including forks when ancestry is shared)
 
 ## Testing
 

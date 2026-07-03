@@ -52,8 +52,9 @@ notes/                     TODO, retrospectives, tree-sitter analysis
 - Tree-sitter is lazy-loaded (18ms cold, 2.3ms warm) — only initializes on first
   PHP/Elisp read
 - Graceful fallback: if WASM fails, PHP falls back to regex (`php-regex.ts`)
-- Status widget shows live-process cumulative savings: `📐 8KB` (resets on
-  restart or `/reload`; use `bench.ts` for historical session replay)
+- Status widget shows session-backed cumulative savings: `📐 8KB` (restores
+  for the same session tree, including forks when ancestry is shared; use
+  `bench.ts` for historical session replay)
 
 ## Testing
 

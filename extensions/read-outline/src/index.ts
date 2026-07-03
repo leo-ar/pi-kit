@@ -20,6 +20,10 @@ import { LINE_THRESHOLD, type ReadInput } from "./types.ts";
 import { extractText, isSupportedFile } from "./utils.ts";
 import { generateOutline } from "./outline.ts";
 import { formatOutlineResult } from "./format.ts";
+import {
+  READ_OUTLINE_STATE_TYPE,
+  loadReadOutlineState,
+} from "./persistence.ts";
 
 export default function readOutlineExtension(pi: ExtensionAPI) {
   // Track which files have been outlined this session.
@@ -35,15 +39,27 @@ export default function readOutlineExtension(pi: ExtensionAPI) {
   }
 
   function updateStatus(ctx: {
-    ui: { setStatus(key: string, text: string): void };
+    ui: { setStatus(key: string, text: string | undefined): void };
   }) {
     ctx.ui.setStatus("read-outline", `📐 ${formatBytes(savedBytes)}`);
   }
 
-  // Reset tracking on new session
+  function persistState() {
+    pi.appendEntry(READ_OUTLINE_STATE_TYPE, {
+      version: 1,
+      savedBytes,
+      outlinedFiles: [...outlinedFiles],
+    });
+  }
+
+  // Reset tracking on new session; restore if available.
   pi.on("session_start", (_event, ctx) => {
     outlinedFiles.clear();
-    savedBytes = 0;
+    const restored = loadReadOutlineState(ctx.sessionManager.getEntries());
+    savedBytes = restored?.savedBytes ?? 0;
+    for (const file of restored?.outlinedFiles ?? []) {
+      outlinedFiles.add(file);
+    }
     updateStatus(ctx);
   });
 
@@ -85,6 +101,7 @@ export default function readOutlineExtension(pi: ExtensionAPI) {
     // Track that we outlined this file
     outlinedFiles.add(filePath);
     savedBytes += textBlock.text.length - replacement.length;
+    persistState();
     updateStatus(ctx);
 
     return {

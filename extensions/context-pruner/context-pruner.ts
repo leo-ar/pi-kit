@@ -15,12 +15,42 @@ import {
   type PrunerConfig,
   type AnyMessage,
 } from "./pruning.ts";
+import {
+  CONTEXT_PRUNER_STATE_TYPE,
+  loadContextPrunerState,
+} from "./persistence.ts";
 
 export default function contextPruner(pi: ExtensionAPI) {
   let config: PrunerConfig = { ...DEFAULT_CONFIG };
   let totalSaved = 0;
   let totalCalls = 0;
   let lastStats = { totalMessages: 0, toolResults: 0, pruned: 0 };
+
+  function formatBytes(bytes: number): string {
+    if (bytes < 1024) return `${Math.floor(bytes)}B`;
+    if (bytes < 1024 * 1024) return `${Math.floor(bytes / 1024)}KB`;
+    return `${Math.floor(bytes / (1024 * 1024))}MB`;
+  }
+
+  function updateStatus(ctx: { ui: { setStatus(key: string, text: string): void } }) {
+    const saved = formatBytes(totalSaved);
+    ctx.ui.setStatus("prune-stats", `🪓 ${saved} K${config.recentTurnsToKeep}`);
+  }
+
+  function persistState() {
+    pi.appendEntry(CONTEXT_PRUNER_STATE_TYPE, {
+      version: 1,
+      totalSaved,
+      totalCalls,
+    });
+  }
+
+  pi.on("session_start", (_event, ctx) => {
+    const restored = loadContextPrunerState(ctx.sessionManager.getEntries());
+    totalSaved = restored?.totalSaved ?? 0;
+    totalCalls = restored?.totalCalls ?? 0;
+    updateStatus(ctx);
+  });
 
   // ─── Context Event: prune stale tool results ─────────────────────────────
 
@@ -36,14 +66,8 @@ export default function contextPruner(pi: ExtensionAPI) {
       pruned: stats.pruned,
     };
 
-    function formatBytes(bytes: number): string {
-      if (bytes < 1024) return `${Math.floor(bytes)}B`;
-      if (bytes < 1024 * 1024) return `${Math.floor(bytes / 1024)}KB`;
-      return `${Math.floor(bytes / (1024 * 1024))}MB`;
-    }
-
-    const saved = formatBytes(totalSaved);
-    ctx.ui.setStatus("prune-stats", `🪓 ${saved} K${config.recentTurnsToKeep}`);
+    updateStatus(ctx);
+    persistState();
 
     return { messages: pruned };
   });
@@ -95,6 +119,7 @@ export default function contextPruner(pi: ExtensionAPI) {
       ctx.ui.notify(
         `K${config.recentTurnsToKeep} — keeping ${config.recentTurnsToKeep} recent turns`,
       );
+      updateStatus(ctx);
     },
   });
 
@@ -132,6 +157,7 @@ export default function contextPruner(pi: ExtensionAPI) {
           value === "true" || value === "1";
       }
       ctx.ui.notify(`${key} = ${(config as Record<string, unknown>)[key]}`);
+      updateStatus(ctx);
     },
   });
 }

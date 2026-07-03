@@ -35,8 +35,9 @@ import { Config } from "./types";
 File has 312 lines. Use read with offset/limit to view specific sections.
 ```
 
-**Anti-loop**: Tracks outlined files per session. If the agent re-reads without
-offset/limit (wants the full content), the second read passes through.
+**Anti-loop**: Tracks outlined files per session and persists them with the
+session state. If the agent re-reads without offset/limit (wants the full
+content), the second read passes through.
 
 **Languages**: TypeScript, JavaScript, Python, Go, Rust, Ruby, C/C++,
 Java/Kotlin/C#, PHP, CSS, HTML, Elisp.
@@ -59,9 +60,10 @@ Benchmarked across 14 real sessions (73 outlines):
 
 Status bar auto-updates: `📐 8KB`
 
-The status widget is live-process state: it resets on pi restart or `/reload`.
-Use `npx tsx bench.ts` to replay saved sessions when you want historical
-aggregate savings.
+The status widget now restores from session-backed state for the same session
+tree (including forks when the ancestry is shared), and still resets for
+unrelated sessions. Use `npx tsx bench.ts` to replay saved sessions when you
+want historical aggregate savings.
 
 No slash commands — the extension is fully automatic.
 
