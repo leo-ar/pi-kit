@@ -46,6 +46,10 @@ export function countToolCall(
 
 export function countCompaction(state: SessionBloatState): SessionBloatState {
   const next = cloneState(state);
+  next.reads = 0;
+  next.edits = 0;
+  next.writes = 0;
+  next.repeatedReads = 0;
   next.compactions += 1;
   return next;
 }
@@ -60,21 +64,21 @@ export function scoreSession(
     state.compactions * 4 +
     state.repeatedReads * 2;
 
-  if (state.compactions >= 3 && state.repeatedReads >= 5) {
+  if (state.compactions >= 3) {
     return {
       severity: "strong",
-      reason: "multiple compactions plus repeated rereads",
+      reason: "multiple compactions indicate a bloated session",
     };
   }
   if (
-    state.compactions >= 2 ||
+    state.compactions >= 3 ||
     state.reads >= 100 ||
     state.edits + state.writes >= 50
   ) {
     return { severity: "warn", reason: "heavy session churn" };
   }
   if (
-    state.compactions >= 1 ||
+    state.compactions >= 2 ||
     state.reads >= 50 ||
     state.edits + state.writes >= 20 ||
     state.repeatedReads >= 3 ||

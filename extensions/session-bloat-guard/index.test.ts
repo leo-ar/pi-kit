@@ -9,6 +9,7 @@ function createHarness() {
   const notifyCalls: string[] = [];
   const commands: Record<string, { description: string; handler: Function }> =
     {};
+  const entries: any[] = [];
 
   const pi = {
     on(name: string, handler: Function) {
@@ -20,6 +21,9 @@ function createHarness() {
       config: { description: string; handler: Function },
     ) {
       commands[name] = config;
+    },
+    appendEntry(customType: string, data?: unknown) {
+      entries.push({ type: "custom", customType, data });
     },
   } as any;
 
@@ -35,11 +39,24 @@ function createHarness() {
         notifyCalls.push(text);
       },
     },
+    sessionManager: {
+      getEntries() {
+        return entries;
+      },
+    },
   } as any;
 
   sessionBloatGuard(pi);
 
-  return { handlers, statusCalls, widgetCalls, notifyCalls, commands, ctx };
+  return {
+    handlers,
+    statusCalls,
+    widgetCalls,
+    notifyCalls,
+    commands,
+    entries,
+    ctx,
+  };
 }
 
 function emit(
@@ -56,21 +73,35 @@ test("registers the expected lifecycle handlers and command", () => {
   assert.ok(harness.handlers.session_start?.length);
   assert.ok(harness.handlers.tool_call?.length);
   assert.ok(harness.handlers.session_before_compact?.length);
+  assert.ok(harness.handlers.session_compact?.length);
   assert.ok(harness.handlers.session_shutdown?.length);
   assert.ok(harness.commands["session-bloat"]);
 });
 
-test("session_start initializes the single-circle UI and stays silent on resume", () => {
+test("session_start restores historical state on resume and resets on new", () => {
   const harness = createHarness();
+
   emit(harness, "session_start", { reason: "startup" });
+  for (let i = 0; i < 50; i += 1) {
+    emit(harness, "tool_call", { toolName: "read" });
+  }
 
-  assert.deepEqual(harness.statusCalls.at(-1), ["session-bloat", "🟢"]);
-  assert.deepEqual(harness.widgetCalls.at(-1), ["session-bloat", ["🟢"]]);
-  assert.equal(harness.notifyCalls.length, 0);
+  assert.deepEqual(harness.statusCalls.at(-1), ["session-bloat", "🟡"]);
+  assert.equal(
+    harness.notifyCalls.includes(
+      "🟡 Session bloat: session is starting to grow",
+    ),
+    true,
+  );
 
+  emit(harness, "session_shutdown", { reason: "reload" });
   emit(harness, "session_start", { reason: "resume" });
+  assert.deepEqual(harness.statusCalls.at(-1), ["session-bloat", "🟡"]);
+  assert.equal(harness.notifyCalls.length, 1);
+
+  emit(harness, "session_shutdown", { reason: "new" });
+  emit(harness, "session_start", { reason: "new" });
   assert.deepEqual(harness.statusCalls.at(-1), ["session-bloat", "🟢"]);
-  assert.equal(harness.notifyCalls.length, 0);
 });
 
 test("tool_call updates the circle UI and warning state", () => {
@@ -87,23 +118,25 @@ test("tool_call updates the circle UI and warning state", () => {
 
   assert.equal(
     harness.notifyCalls.includes(
-      "Session bloat: 🟡 session is starting to grow",
+      "🟡 Session bloat: session is starting to grow",
     ),
     true,
   );
   assert.deepEqual(harness.statusCalls.at(-1), ["session-bloat", "🟡"]);
 });
 
-test("session_before_compact increments compactions and session_shutdown clears ephemeral state", () => {
+test("session_compact can lower the severity after churn", () => {
   const harness = createHarness();
   emit(harness, "session_start", { reason: "startup" });
-  emit(harness, "session_before_compact", {});
+  for (let i = 0; i < 50; i += 1) {
+    emit(harness, "tool_call", { toolName: "read" });
+  }
 
   assert.deepEqual(harness.statusCalls.at(-1), ["session-bloat", "🟡"]);
-  assert.deepEqual(harness.widgetCalls.at(-1), ["session-bloat", ["🟡"]]);
 
-  emit(harness, "session_shutdown", {});
-  emit(harness, "session_start", { reason: "startup" });
+  emit(harness, "session_before_compact", {});
+  emit(harness, "session_compact", {});
+
   assert.deepEqual(harness.statusCalls.at(-1), ["session-bloat", "🟢"]);
 });
 

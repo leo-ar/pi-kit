@@ -54,38 +54,48 @@ test("countToolCall is exact and non-mutating for built-in tools", () => {
   );
 });
 
-test("countCompaction is exact and non-mutating", () => {
+test("countCompaction resets the active segment and increments compactions", () => {
   fc.assert(
     fc.property(stateArb, (state) => {
       const snapshot = { ...state };
       const next = countCompaction(state);
       assert.deepEqual({ ...state }, snapshot);
       assert.deepEqual(next, {
-        ...snapshot,
+        reads: 0,
+        edits: 0,
+        writes: 0,
         compactions: snapshot.compactions + 1,
+        repeatedReads: 0,
       });
     }),
     { numRuns: 20 },
   );
 });
 
-test("severity never decreases when a single activity counter increases", () => {
+test("severity never decreases when ordinary activity counters increase", () => {
   fc.assert(
     fc.property(
       stateArb,
-      fc.constantFrom(
-        "reads",
-        "edits",
-        "writes",
-        "compactions",
-        "repeatedReads",
-      ),
+      fc.constantFrom("reads", "edits", "writes", "repeatedReads"),
       (state, field) => {
         const base = describeSession(state);
         const more = describeSession({ ...state, [field]: state[field] + 1 });
         assert.ok(severityRank(more.severity) >= severityRank(base.severity));
       },
     ),
+    { numRuns: 20 },
+  );
+});
+
+test("compaction can lower severity by resetting the active segment", () => {
+  fc.assert(
+    fc.property(stateArb, (state) => {
+      const before = describeSession({ ...state, reads: 50, compactions: 0 });
+      const after = describeSession(
+        countCompaction({ ...state, reads: 50, compactions: 0 }),
+      );
+      assert.ok(severityRank(after.severity) <= severityRank(before.severity));
+    }),
     { numRuns: 20 },
   );
 });

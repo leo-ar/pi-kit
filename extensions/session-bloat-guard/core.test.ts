@@ -22,11 +22,29 @@ test("countToolCall increments the matching counter without mutating the input",
   assert.equal(next.writes, 0);
 });
 
-test("countCompaction increments compactions without mutating the input", () => {
-  const before = resetState();
+test("countCompaction resets the active segment and increments compactions", () => {
+  const before = {
+    ...INITIAL_STATE,
+    reads: 12,
+    edits: 8,
+    writes: 4,
+    repeatedReads: 2,
+  };
   const next = countCompaction(before);
-  assert.deepEqual(before, INITIAL_STATE);
-  assert.equal(next.compactions, 1);
+  assert.deepEqual(before, {
+    ...INITIAL_STATE,
+    reads: 12,
+    edits: 8,
+    writes: 4,
+    repeatedReads: 2,
+  });
+  assert.deepEqual(next, {
+    reads: 0,
+    edits: 0,
+    writes: 0,
+    compactions: 1,
+    repeatedReads: 0,
+  });
 });
 
 test("scoreSession stays normal for a quiet session", () => {
@@ -43,13 +61,28 @@ test("scoreSession escalates on reads and edits", () => {
   assert.equal(warn.severity, "warn");
 });
 
-test("scoreSession escalates to strong on compaction churn and rereads", () => {
+test("scoreSession escalates to strong on repeated compactions", () => {
   const strong = describeSession({
     ...INITIAL_STATE,
-    compactions: 3,
+    compactions: 4,
     repeatedReads: 5,
   });
   assert.equal(strong.severity, "strong");
+});
+
+test("severity never decreases when ordinary activity counters increase", () => {
+  const severityRank = (severity: string) =>
+    ({ normal: 0, watch: 1, warn: 2, strong: 3 })[severity] ?? -1;
+
+  const base = describeSession(resetState());
+  const more = describeSession({
+    ...INITIAL_STATE,
+    reads: 1,
+    edits: 1,
+    writes: 1,
+    repeatedReads: 1,
+  });
+  assert.ok(severityRank(more.severity) >= severityRank(base.severity));
 });
 
 test("describeSession includes a status string", () => {

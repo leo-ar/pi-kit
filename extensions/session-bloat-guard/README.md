@@ -6,7 +6,8 @@ simple severity indicator before the session becomes too expensive.
 ## What it does
 
 - tracks reads, edits, writes, and compactions for the current session
-- computes a transparent severity score
+- computes a transparent severity score from session history
+- restores the same logical score after reload/resume instead of resetting to green
 - updates a single colored status indicator as the session grows
 - provides a `/session-bloat` command with a single-line summary of the current state
 
@@ -16,6 +17,7 @@ simple severity indicator before the session becomes too expensive.
 - it does not split sessions on your behalf
 - it does not replace pruning or compaction tools
 - it does not show a detailed live counter widget
+- it does not persist anything outside the session itself
 
 ## Install
 
@@ -30,3 +32,10 @@ For development, symlink the directory into `~/.pi/agent/extensions/` and run
 
 - live UI: a single colored circle in the status area
 - `/session-bloat`: a single-line summary with the current severity and counters
+- compaction can lower the score when the active segment shrinks
+
+## Validation note
+
+Archive timeline validation suggests v1 is enough as a trend signal: healthy and
+moderate sessions stay green, while heavy sessions transition to
+watch/warn/strong early enough to intervene.

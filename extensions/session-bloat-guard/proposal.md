@@ -6,6 +6,10 @@
 session for signs of bloat and nudges the user when the session is likely to
 benefit from a manual `/compact`, a fresh split, or a narrower task boundary.
 
+Its real purpose is to help reduce excessive token-cached reads — ideally by a
+large margin, on the order of 5x or more in the sessions it successfully
+intervenes in. The extension is a means to that end, not the end itself.
+
 The extension is intentionally advisory, not punitive. It should make growth
 visible early enough that the user can intervene before the session becomes
 expensive, noisy, or hard to reason about.
@@ -26,14 +30,15 @@ way that is easy to act on.
 
 ## Goals
 
-1. Detect session growth using simple, transparent heuristics.
-2. Show the current bloat level in the UI without interrupting workflow.
-3. Warn only when the signal is strong enough to be useful.
-4. Encourage one of three actions:
+1. Reduce excessive token-cached reads by catching the sessions that drive them.
+2. Detect session growth using simple, transparent heuristics.
+3. Show the current bloat level in the UI without interrupting workflow.
+4. Warn only when the signal is strong enough to be useful.
+5. Encourage one of three actions:
    - compact the session
    - start a fresh session for the next subtask
    - narrow the scope of the current task
-5. Keep state local to the current session and avoid persistent storage.
+6. Keep state local to the current session and avoid persistent storage.
 
 ## Non-goals
 
@@ -72,7 +77,9 @@ requiring them to drive the first scoring pass.
 ## Heuristic model
 
 Version 1 should use transparent threshold tiers, with room to evolve toward a
-weighted score later if needed.
+weighted score later if needed. The live score should be derived from session
+history and persisted in session data so reloads and resumes restore the same
+logical session state instead of resetting it.
 
 ### Example scoring direction
 
@@ -105,17 +112,17 @@ These are starting points for tuning:
   - 50+ reads, or
   - 20+ edits/writes, or
   - same file read 3+ times, or
-  - 1 compaction
+  - 2+ compactions
 
 - **Warn**
   - 100+ reads, or
   - 50+ edits/writes, or
-  - 2+ compactions, or
+  - 3+ compactions, or
   - repeated rereads of the same files after compaction
 
 - **Strong warn**
-  - 3+ compactions, plus
-  - high reread churn and a large edit/read ratio
+  - 3+ compactions
+  - high reread churn and a large edit/read ratio once that signal is available
 
 ## User experience
 
@@ -149,8 +156,9 @@ The extension may expose a small command set for inspection and control.
 ### Proposed commands
 
 - `/session-bloat` — show a single-line summary of the current counters and severity
-- `/session-bloat reset` — clear session-local counters
-- `/session-bloat tune` — show or edit threshold values for the current session
+
+If validation later suggests the need for more control, `reset` and `tune`
+variants can be added as follow-up commands.
 
 ### Optional actions
 
@@ -162,22 +170,24 @@ The extension may expose a small command set for inspection and control.
 
 ### Event hooks
 
-- `session_start` — initialize counters and reset any session-local warning state; also handle resumed sessions because Pi emits this event with `reason: "resume"`
+- `session_start` — restore the current score from session history; only `reason: "new"` starts from zero
 - `tool_call` — count reads, edits, writes, and other observable growth signals
 - `tool_result` — inspect results for repeated access patterns if needed later
-- `session_before_compact` — increment compaction counters and update severity
+- `session_before_compact` — observe imminent compaction without assuming the score changes yet
+- `session_compact` — recalculate the current score after compaction, which may lower severity
 - `context` — optionally summarize stale activity into a lightweight view later
 
-Because Pi re-emits `session_start` after `/resume`, the guard should recalculate and refresh its UI there so the status is correct immediately after session restoration, without any extra resume-specific notice.
+Because Pi re-emits `session_start` after `/resume`, the guard should restore the persisted historical state there so the status continues from the same logical session instead of dropping back to green.
 
 ### State model
 
 The extension should keep only session-local state, such as:
 
-- counters
+- counters for the active segment and current session history
 - reserved slots for future per-file access counts
 - last severity level emitted
 - last warning reason
+- persisted snapshots in session data so reloads can restore the same score
 
 ### Update policy
 
@@ -192,10 +202,12 @@ A first implementation is acceptable when it can:
 
 1. Track the core counters for the current session.
 2. Compute a stable severity level from the counters.
-3. Display the severity in the status bar or a widget.
-4. Emit a concise warning when a threshold is crossed.
+3. Display the severity as a single colored status indicator.
+4. Emit a concise severity-change notification when a threshold is crossed.
 5. Avoid spamming the user with repeated messages.
-6. Reset cleanly at the start of a new session.
+6. Reset cleanly only when a genuinely new session starts.
+7. Restore the same logical score after reloads and resumes.
+8. Allow compaction to lower the score when the active segment shrinks.
 
 ## Risks and trade-offs
 
@@ -207,8 +219,25 @@ A first implementation is acceptable when it can:
 
 ## Validating whether v1 is enough
 
-The right question for v1 is not whether it is perfect, but whether it is
-useful on real recorded sessions.
+Validation should happen in a separate evidence workspace under
+`notes/pi-extension-eval/session-bloat-guard/`, using recorded Pi session
+archives and a repeatable rubric. The workspace may reuse the existing
+`notes/pi-extension-eval` scoring/analyze scripts if they are useful. The
+findings should then be summarized back into the main proposal and README.
+
+Important: session boundaries matter. Only `session_start` with
+`reason: "new"` resets the score to zero. Reload, resume, and fork should
+restore the persisted historical score from session data. Validation should
+therefore check that the UI continues from the same logical session instead of
+dropping back to green after a reload.
+
+The key validation question is timeline-based: on real sessions, does the color
+move from green to yellow/orange/red early enough that the user could still act
+before the repeated rehydration / cache-read problem becomes expensive?
+
+The right question for v1 is not whether it is perfect, but whether it helps
+reduce the conditions that lead to excessive token-cached reads on real
+recorded sessions.
 
 ### Evaluation set
 
@@ -220,27 +249,50 @@ Use a small corpus of recorded Pi sessions that covers:
 - sessions that should have been split into separate subtasks
 - sessions with noisy shell output or repeated file access
 
+### Validation rubric
+
+Use a simple repeatable rubric for each recorded session:
+
+- Healthy
+- Watch
+- Warn
+- Strong warn
+
+And outcome labels for the evaluation pass:
+
+- compact-worthy
+- split-worthy
+- false positive
+- false negative
+- late warning
+- missed warning
+
 ### What to measure
 
-Replay or inspect the recorded sessions and compare the v1 score against human
-judgment and obvious session outcomes.
+Replay or inspect the recorded sessions and compare the v1 score against the
+session timeline itself.
 
 Useful checks include:
 
-- did the warning appear before the session became painful?
-- did it stay quiet for focused sessions?
-- did it escalate at a moment the user would reasonably compact or split?
-- how often did it warn too early, too late, or not at all?
-- did the explanation match the observed session behavior?
+- did focused sessions stay green throughout?
+- did unhealthy sessions move to yellow/orange/red early enough in the event/
+  turn timeline?
+- at what point in the 0–500 normalized timeline did each color first appear?
+- how much cacheRead had already accumulated by the time the color changed?
+- did compaction lower the score when the active segment shrank?
+- did the score stay stable across reload/resume boundaries?
 
 ### Success criteria for v1
 
-v1 is enough if most clearly bloated sessions are flagged early, while focused
-sessions remain mostly quiet. In practice, that means:
+v1 is enough if the timeline analysis shows the right trend on real sessions. In
+practice, that means:
 
-- low false positives on short or focused sessions
-- reasonable lead time before a manual `/compact` or session split
-- warning text that matches the session’s actual shape
+- focused sessions stay green throughout
+- unhealthy sessions show yellow/orange/red early enough to take action
+- the color changes happen before the repeated rehydration / cache-read churn
+  has already consumed most of the session
+- the score restoration holds across reload/resume boundaries
+- compaction can lower the score when the active segment shrinks
 - no need for additional signals in the common case
 
 ### If v1 is not enough
@@ -257,6 +309,27 @@ Priority should go to signals that are easy to observe and explain:
 The goal is to improve the score only where the recorded sessions show a clear
 miss, not to turn the guard into a complex classifier.
 
+### Decision rule
+
+After the validation pass, decide between three outcomes:
+
+1. v1 is enough as-is to materially reduce the token-cached-read problem.
+2. v1 needs a small signal addition and another tuning pass.
+3. v1 is not enough and should be reconsidered more broadly.
+
+The analysis is only useful if it helps answer whether the extension is
+actually accomplishing the underlying goal, not just whether the heuristic
+produces numbers or labels.
+
+### Current conclusion
+
+The archive timeline analysis is encouraging: healthy and moderate sessions stay
+green, while high-cacheRead sessions move through watch/warn/strong early enough
+to let the user intervene. The analysis does not prove a literal 5x reduction,
+but it does support the claim that v1 surfaces the problem in time for action.
+On the current evidence, v1 does not appear to need v2 to solve the original
+trend-warning problem.
+
 ## Recommended v1 scope
 
 Start with just three things:
@@ -268,7 +341,7 @@ Start with just three things:
 If v1 proves useful, later versions can add:
 
 - per-file hot-spot reporting
-- a `/session-bloat` inspection command
+- richer `/session-bloat` detail output
 - suggested split points
 - session-specific tuning
 

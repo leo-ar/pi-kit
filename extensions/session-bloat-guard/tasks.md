@@ -24,14 +24,15 @@
 
 ## Phase 2: event collection and lifecycle
 
-- [x] Hook `session_start` to initialize or reset counters and UI state, including resumed sessions (`reason: "resume"`)
+- [x] Hook `session_start` to restore the persisted historical score for reload/resume/fork, while only `reason: "new"` starts from zero
 - [x] Hook `tool_call` to increment counters for `read`, `edit`, `write`, and other observable growth signals
 - [x] Hook `tool_result` if needed to inspect result metadata for future repeated-access tracking
-- [x] Hook `session_before_compact` to record compaction history and update severity
+- [x] Hook `session_before_compact` to observe imminent compaction without assuming the score changes yet
+- [x] Hook `session_compact` to recalculate the score after compaction and allow severity to drop when the active segment shrinks
 - [x] Keep repeated-read tracking as a reserved signal until the event data needed to compute it is added
 - [x] Ensure event handlers remain session-local and do not persist state globally
-- [x] Verify UI is refreshed immediately after session restoration so the status is correct on `/resume`
-- [x] Hook `session_shutdown` to clear ephemeral state at the end of the session instance
+- [x] Verify UI is restored from historical state immediately after session resume/reload so it does not drop back to green incorrectly
+- [x] Hook `session_shutdown` to clear only ephemeral in-memory state at the end of the session instance
 
 ## Phase 3: user interface and command
 
@@ -45,22 +46,35 @@
 - [x] Keep command output to a single-line summary for v1
 - [x] Keep the command as a plain `notify(...)` message
 
-## Phase 4: validation
+## Phase 4: validation workspace and rubric
 
-- [x] Test a session with repeated reads and edits to confirm severity increases
-- [x] Test compaction events to confirm counters update correctly
-- [x] Test that warnings are not spammed repeatedly
-- [x] Verify state resets at new session start
-- [x] Confirm the status indicator and widget update as expected
-- [x] Add wrapper integration tests for session start, resume, compaction, shutdown, and the `/session-bloat` command
-- [x] Simplify the resume-path test so it only verifies UI refresh, not a visible resume notice
+- [x] Scaffold `notes/pi-extension-eval/session-bloat-guard/` as a separate evidence workspace
+- [x] Add workspace files: `AGENTS.md`, `README.md`, `notes.md`, `hypotheses.md`, `verified-facts.md`, `unsupported-facts.md`, `open-questions.md`, and `TODO.md`
+- [x] Reuse or adapt the existing `notes/pi-extension-eval` scoring/analyze scripts if they help the new corpus
+- [x] Define the recorded-session corpus selection rules for focused, healthy, bloated, split-worthy, and noisy sessions
+- [x] Define a repeatable rubric with labels for Healthy, Watch, Warn, Strong warn, and outcome tags like compact-worthy / split-worthy / false positive / false negative / late warning / missed warning
+- [x] Document how validation compares v1 scores against the rubric and session outcomes
+- [x] Treat only `session_start` with `reason: "new"` as a score reset; reload/resume must restore the historical score
+
+## Phase 5: recorded-session validation
+
+- [x] Sample representative recorded sessions from the Pi archive
+- [x] Score sessions with the v1 heuristics against the recorded tool/event data
+- [x] Measure the event/turn timeline and the point where each severity color first appears
+- [x] Compare color transitions against cumulative cacheRead in the same session
+- [x] Verify that healthy sessions stay green throughout
+- [x] Verify that unhealthy sessions move through yellow/orange/red early enough to act
+- [x] Check that compaction can lower the score and that reload/resume keeps the historical score
 - [x] Keep command-handler tests lightweight and focused on the public inspection output
-- [ ] Validate v1 against a corpus of recorded sessions: focused, long-but-healthy, bloated, split-worthy, and noisy sessions
-- [ ] Measure false positives, false negatives, and lead time before manual compaction or splitting
-- [ ] If v1 underperforms on recorded sessions, add only the smallest extra signals that explain the misses
+- [x] Record the timeline observations in the validation workspace
+- [x] Measure false positives, false negatives, and lead time before manual compaction or splitting
+- [x] Identify whether the warning timing and severity are directionally correct
 
-## Phase 5: post-validation polish
+## Phase 6: post-validation decision and polish
 
-- [ ] Tune initial thresholds based on real sessions
-- [ ] Decide whether to add per-file hot-spot reporting in v2
-- [ ] Document known limitations and non-goals in the README
+- [x] Decide whether v1 is enough as-is, needs a small signal addition, or should be reconsidered more broadly
+- [x] If validation shows clear misses, add only the smallest extra signals that explain the misses
+- [x] Tune initial thresholds based on the validation results
+- [x] Summarize the validation conclusions back into `proposal.md` and `README.md`
+- [x] Decide whether to add per-file hot-spot reporting in v2
+- [x] Document known limitations and non-goals in the README
