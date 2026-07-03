@@ -15,6 +15,9 @@ session.
 
 ```text
 index.ts     Entry point — session scoring, session-data restore, status, command
+core.ts      Pure scoring/state logic
+core.test.ts  Unit tests for scoring and state helpers
+core.properties.test.ts  Property tests for scoring invariants
 README.md    User-facing overview and install instructions
 proposal.md  Design/specification
 tasks.md     Implementation checklist
@@ -22,7 +25,7 @@ tasks.md     Implementation checklist
 
 ## Initial implementation shape
 
-- Keep the live state in memory and persist snapshots in session data.
+- Keep the live state in memory during the session and persist snapshots in session data for restore.
 - Use a simple weighted heuristic for v1.
 - Restore the score from session history on reload/resume/fork.
 - Update status text only when severity changes.

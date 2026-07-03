@@ -7,7 +7,7 @@ simple severity indicator before the session becomes too expensive.
 
 - tracks reads, edits, writes, and compactions for the current session
 - computes a transparent severity score from session history
-- restores the same logical score after reload/resume instead of resetting to green
+- restores the same logical score after reload/resume/fork instead of resetting to green
 - updates a single colored status indicator as the session grows
 - provides a `/session-bloat` command with a single-line summary of the current state
 
@@ -17,7 +17,7 @@ simple severity indicator before the session becomes too expensive.
 - it does not split sessions on your behalf
 - it does not replace pruning or compaction tools
 - it does not show a detailed live counter widget
-- it does not persist anything outside the session itself
+- it does not persist anything outside the session tree itself
 
 ## Install
 

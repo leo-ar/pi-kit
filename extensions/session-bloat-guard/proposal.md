@@ -38,7 +38,7 @@ way that is easy to act on.
    - compact the session
    - start a fresh session for the next subtask
    - narrow the scope of the current task
-6. Keep state local to the current session and avoid persistent storage.
+6. Keep state local to the current session tree and avoid external persistent storage.
 
 ## Non-goals
 
@@ -187,7 +187,7 @@ The extension should keep only session-local state, such as:
 - reserved slots for future per-file access counts
 - last severity level emitted
 - last warning reason
-- persisted snapshots in session data so reloads can restore the same score
+- persisted snapshots in session data so reloads, resumes, and forks can restore the same logical score
 
 ### Update policy
 
